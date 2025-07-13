@@ -4,51 +4,98 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
+
   <!-- Firebase SDKs compat -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  
+
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
     body {
       font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ff5e78, 0 0 30px #ff5e78;
+      margin-bottom: 40px;
+      animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #fff, 0 0 20px #ff5e78, 0 0 30px #ff5e78;
+      }
+      to {
+        text-shadow: 0 0 20px #fff, 0 0 40px #ff5e78, 0 0 60px #ff5e78;
+      }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
       padding: 30px;
-      background: #f9f9f9;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
       text-align: center;
     }
+
+    .container h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
     input, button {
-      width: 90%;
-      max-width: 300px;
-      padding: 12px;
-      font-size: 18px;
-      margin: 10px auto;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin: 12px 0;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      display: block;
+      box-sizing: border-box;
     }
+
     button {
-      background-color: #28a745;
+      background: linear-gradient(45deg, #28a745, #218838);
       color: white;
-      border: none;
+      font-weight: bold;
       cursor: pointer;
+      border: none;
+      transition: 0.3s ease;
     }
+
     button:hover {
-      background-color: #218838;
+      background: linear-gradient(45deg, #218838, #1e7e34);
     }
+
     #message {
-      margin-top: 20px;
-      font-size: 18px;
-      min-height: 28px;
-      color: red;
+      margin-top: 15px;
+      font-size: 16px;
+      min-height: 24px;
     }
   </style>
 </head>
 <body>
 
-  <h2>تسجيل الدخول برقم الهاتف</h2>
-  <input id="phoneNumber" type="text" placeholder="أدخل رقمك" />
-  <button onclick="loginWithPhone()">دخول</button>
-  <div id="message"></div>
+  <h1>Abu Shawqi for bouquets</h1>
+
+  <div class="container">
+    <h2>تسجيل الدخول برقم الهاتف</h2>
+    <input id="phoneNumber" type="text" placeholder="أدخل رقمك بدون +20" />
+    <button onclick="loginWithPhone()">دخول</button>
+    <div id="message"></div>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -72,14 +119,12 @@
 
     async function loginWithPhone() {
       let phone = document.getElementById('phoneNumber').value.trim();
-      console.log("رقم الهاتف المدخل:", phone);
-
       if (!phone) {
         showMessage('❗ من فضلك أدخل رقم الهاتف');
         return;
       }
 
-      // إزالة +20 إذا كانت مكتوبة
+      // إزالة +20 لو موجود
       if (phone.startsWith('+20')) {
         phone = phone.slice(3);
       }
@@ -87,12 +132,9 @@
       showMessage('⏳ جاري التحقق من الرقم...', false);
 
       const refPath = 'allowedPhones/' + phone;
-      console.log("مسار القراءة:", refPath);
 
       try {
         const snapshot = await db.ref(refPath).get();
-        console.log("هل الرقم موجود؟", snapshot.exists());
-        console.log("قيمة الرقم:", snapshot.val());
 
         if (snapshot.exists() && snapshot.val() === true) {
           showMessage('✅ رقمك مسجل! جاري الدخول...', false);
@@ -104,7 +146,7 @@
         }
       } catch (error) {
         showMessage('❌ حدث خطأ في الاتصال بالنظام.');
-        console.error("خطأ:", error);
+        console.error("Firebase Error:", error);
       }
     }
   </script>
