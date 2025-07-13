@@ -2,16 +2,83 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>إضافة رقم إلى Firebase</title>
+  <title>لوحة تحكم الأرقام</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f2f2f2;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 250px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      background: #fff;
+      margin: 8px auto;
+      padding: 10px;
+      border-radius: 8px;
+      width: 300px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .delete-btn {
+      background: #dc3545;
+    }
+
+    .delete-btn:hover {
+      background: #c82333;
+    }
+  </style>
 </head>
 <body>
-  <h2>إضافة رقم</h2>
+
+  <h2>لوحة تحكم الأرقام</h2>
   <input type="text" id="phone" placeholder="أدخل رقم الهاتف بدون +20" />
   <button onclick="addPhone()">إضافة</button>
 
+  <ul id="phoneList"></ul>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
@@ -25,19 +92,56 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const phonesRef = ref(db, 'allowedPhones');
 
+    // إضافة رقم
     window.addPhone = () => {
       let phone = document.getElementById('phone').value.trim();
-      if (!phone) return alert("أدخل رقم الهاتف");
+      if (!phone) return alert("❗ أدخل رقم الهاتف");
 
-      if (!phone.startsWith("+")) {
-        phone = "+20" + phone;
+      // حفظ الرقم بدون +20 في الواجهة، وإضافة +20 داخليًا
+      const fullPhone = "+20" + phone;
+
+      set(ref(db, 'allowedPhones/' + fullPhone), true)
+        .then(() => {
+          alert("✅ تمت إضافة الرقم بنجاح");
+          document.getElementById('phone').value = "";
+        })
+        .catch(err => alert("❌ خطأ: " + err.message));
+    };
+
+    // عرض الأرقام
+    onValue(phonesRef, snapshot => {
+      const phoneList = document.getElementById('phoneList');
+      phoneList.innerHTML = '';
+
+      if (!snapshot.exists()) {
+        phoneList.innerHTML = '<li>لا يوجد أرقام مضافة</li>';
+        return;
       }
 
-      set(ref(db, 'allowedPhones/' + phone), true)
-        .then(() => alert("✅ تمت الإضافة: " + phone))
-        .catch((error) => alert("❌ خطأ: " + error.message));
+      const data = snapshot.val();
+      Object.keys(data).forEach(fullPhone => {
+        const item = document.createElement('li');
+        const shortPhone = fullPhone.replace('+20', '');
+
+        item.innerHTML = `
+          ${shortPhone}
+          <button class="delete-btn" onclick="deletePhone('${fullPhone}')">حذف</button>
+        `;
+        phoneList.appendChild(item);
+      });
+    });
+
+    // حذف رقم
+    window.deletePhone = (fullPhone) => {
+      if (confirm("هل أنت متأكد من حذف الرقم؟")) {
+        remove(ref(db, 'allowedPhones/' + fullPhone))
+          .then(() => alert("🗑️ تم حذف الرقم"))
+          .catch(err => alert("❌ خطأ: " + err.message));
+      }
     };
   </script>
+
 </body>
 </html>
