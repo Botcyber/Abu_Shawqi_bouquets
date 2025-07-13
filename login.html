@@ -22,25 +22,29 @@
     const db = getDatabase(app);
 
     window.login = async function () {
-      let phone = document.getElementById("phone").value.trim();
+      try {
+        let phone = document.getElementById("phone").value.trim();
 
-      if (phone === "") {
-        alert("📱 يرجى إدخال رقم الهاتف");
-        return;
-      }
+        if (phone === "") {
+          alert("📱 يرجى إدخال رقم الهاتف");
+          return;
+        }
 
-      // إضافة +20 إذا لم يبدأ المستخدم برمز الدولة
-      if (!phone.startsWith("+")) {
-        phone = "+20" + phone;
-      }
+        if (!phone.startsWith("+")) {
+          phone = "+20" + phone;
+        }
 
-      const dbRef = ref(db);
-      const snapshot = await get(child(dbRef, "allowedPhones/" + phone));
-      if (snapshot.exists()) {
-        alert("✅ مرحبًا بك! تم تسجيل الدخول.");
-        window.location.href = "home.html"; // وجه المستخدم للصفحة المطلوبة
-      } else {
-        alert("❌ هذا الرقم غير مصرح له بالدخول.");
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, "allowedPhones/" + phone));
+        if (snapshot.exists()) {
+          alert("✅ مرحبًا بك! تم تسجيل الدخول.");
+          window.location.href = "home.html"; // غير هذا إلى الصفحة التي تريد التوجيه إليها
+        } else {
+          alert("❌ هذا الرقم غير مصرح له بالدخول.");
+        }
+      } catch (error) {
+        alert("❌ حدث خطأ أثناء محاولة تسجيل الدخول: " + error.message);
+        console.error(error);
       }
     };
   </script>
