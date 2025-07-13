@@ -24,10 +24,16 @@
     const db = getDatabase(app);
 
     window.login = async function () {
-      const phone = document.getElementById("phone").value.trim();
+      let phone = document.getElementById("phone").value.trim();
+
       if (phone === "") {
         alert("📱 يرجى إدخال رقم الهاتف");
         return;
+      }
+
+      // إضافة +20 إذا لم يبدأ المستخدم برمز الدولة
+      if (!phone.startsWith("+")) {
+        phone = "+20" + phone;
       }
 
       const dbRef = ref(db);
@@ -60,8 +66,8 @@
 <body>
 
   <h2>تسجيل الدخول برقم الهاتف</h2>
-  <input type="text" id="phone" placeholder="مثال: +201234567890" />
-  <br>
+  <input type="text" id="phone" placeholder="مثال: 0123456789" />
+  <br/>
   <button onclick="login()">🚪 دخول</button>
 
 </body>
