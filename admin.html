@@ -2,57 +2,138 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>لوحة إدارة الأرقام</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم الأرقام</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+  <!-- Firebase SDK compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
     body {
       font-family: 'Cairo', sans-serif;
-      background: #f9f9f9;
-      padding: 30px;
-      text-align: center;
-    }
-    h2 { color: #333; margin-bottom: 20px; }
-    input, button {
-      padding: 12px; margin: 10px auto;
-      font-size: 16px; border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 90%; max-width: 300px;
-      display: block;
-    }
-    button {
-      background: #28a745; color: white;
-      border: none; cursor: pointer;
-    }
-    button:hover { background: #218838; }
-    ul {
-      list-style: none; padding: 0;
-      margin-top: 30px;
-    }
-    li {
-      background: white; margin: 10px auto;
-      padding: 12px; width: 90%; max-width: 320px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      display: flex; justify-content: space-between;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 800% 800%;
+      animation: oceanWaves 20s ease infinite;
     }
+
+    @keyframes oceanWaves {
+      0% { background-position: 0% 100%; }
+      50% { background-position: 100% 0%; }
+      100% { background-position: 0% 100%; }
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: white;
+      margin: 30px 0 20px;
+      text-shadow: 0 0 10px #fff, 0 0 25px #f0f, 0 0 35px #0ff;
+      animation: pulseGlow 3s infinite ease-in-out, slideText 4s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #0ff; }
+      100% { text-shadow: 0 0 25px #fff, 0 0 40px #f0f, 0 0 55px #0ff; }
+    }
+
+    @keyframes slideText {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container input, .container button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .container button {
+      background: linear-gradient(45deg, #28a745, #218838);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: 0.3s ease;
+    }
+
+    .container button:hover {
+      background: linear-gradient(45deg, #218838, #1e7e34);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    li {
+      background: white;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
     .delete-btn {
-      background: #dc3545; color: white;
-      border: none; padding: 6px 12px;
-      border-radius: 4px; cursor: pointer;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
     }
-    .delete-btn:hover { background: #c82333; }
+
+    .delete-btn:hover {
+      background: #c82333;
+    }
+
+    #message {
+      font-size: 16px;
+      color: green;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>لوحة التحكم - الأرقام المسموح بها</h2>
-  <input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف بدون +20" />
-  <button onclick="addPhone()">إضافة الرقم</button>
+  <h1>Abu Shawqi for bouquets</h1>
+
+  <div class="container">
+    <h2>إدارة الأرقام المسموحة</h2>
+    <input type="text" id="phoneInput" placeholder="أدخل الرقم بدون +20" />
+    <button onclick="addPhone()">إضافة الرقم</button>
+    <div id="message"></div>
+  </div>
 
   <ul id="phoneList"></ul>
 
@@ -66,42 +147,64 @@
       messagingSenderId: "624365660732",
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function addPhone() {
-      const phone = document.getElementById('phoneInput').value.trim();
-      if (!phone) return alert("❗ من فضلك أدخل رقم الهاتف");
-      db.ref('allowedPhones/' + phone).set(true)
-        .then(() => { alert("✅ تم إضافة الرقم"); loadPhones(); })
-        .catch(err => alert("❌ خطأ: " + err.message));
+    function showMessage(msg) {
+      document.getElementById('message').textContent = msg;
+      setTimeout(() => {
+        document.getElementById('message').textContent = '';
+      }, 3000);
     }
 
-    function loadPhones() {
-      const phoneList = document.getElementById('phoneList');
-      phoneList.innerHTML = "جاري تحميل الأرقام...";
-      db.ref('allowedPhones').once('value')
-        .then(snap => {
-          phoneList.innerHTML = '';
-          const data = snap.val();
-          if (!data) return phoneList.innerHTML = "<li>لا توجد أرقام.</li>";
-          Object.keys(data).forEach(phone => {
-            const li = document.createElement('li');
-            li.innerHTML = `${phone} <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>`;
-            phoneList.appendChild(li);
-          });
+    function addPhone() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      if (!phone) return alert("❗ أدخل رقم الهاتف أولاً");
+
+      db.ref('allowedPhones/' + phone).set(true)
+        .then(() => {
+          showMessage("✅ تم الإضافة بنجاح");
+          document.getElementById('phoneInput').value = "";
+          loadPhones();
         })
-        .catch(() => phoneList.innerHTML = "<li>❌ خطأ في التحميل</li>");
+        .catch(err => alert("❌ خطأ: " + err.message));
     }
 
     function deletePhone(phone) {
-      if (!confirm("حذف " + phone + "؟")) return;
+      if (!confirm("هل تريد حذف الرقم " + phone + "؟")) return;
       db.ref('allowedPhones/' + phone).remove()
-        .then(() => { alert("🗑️ تم الحذف"); loadPhones(); })
-        .catch(err => alert("❌ خطأ: " + err.message));
+        .then(() => {
+          showMessage("🗑️ تم الحذف");
+          loadPhones();
+        })
+        .catch(err => alert("❌ خطأ أثناء الحذف: " + err.message));
+    }
+
+    function loadPhones() {
+      const list = document.getElementById('phoneList');
+      list.innerHTML = '<li>⏳ جاري التحميل...</li>';
+      db.ref('allowedPhones').once('value')
+        .then(snapshot => {
+          list.innerHTML = '';
+          const data = snapshot.val();
+          if (!data) {
+            list.innerHTML = '<li>🚫 لا توجد أرقام مسجلة.</li>';
+            return;
+          }
+          Object.keys(data).forEach(phone => {
+            const li = document.createElement('li');
+            li.innerHTML = `${phone} <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>`;
+            list.appendChild(li);
+          });
+        })
+        .catch(() => {
+          list.innerHTML = '<li>❌ فشل في تحميل الأرقام.</li>';
+        });
     }
 
     window.onload = loadPhones;
   </script>
+
 </body>
 </html>
