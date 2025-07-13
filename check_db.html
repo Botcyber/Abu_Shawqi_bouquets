@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>فحص اتصال Firebase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      direction: rtl;
+      text-align: center;
+    }
+    pre {
+      text-align: left;
+      background: #eee;
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 400px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>عرض كامل بيانات قاعدة Firebase</h2>
+  <div id="output">جارٍ تحميل البيانات...</div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
+      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
+      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
+      projectId: "abu-shawqi-bouquets",
+      storageBucket: "abu-shawqi-bouquets.appspot.com",
+      messagingSenderId: "624365660732",
+      appId: "1:624365660732:web:da0b73e43cfde85a863139"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const outputDiv = document.getElementById("output");
+
+    db.ref("/").get()
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          outputDiv.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+          console.log("بيانات Firebase:", data);
+        } else {
+          outputDiv.textContent = "لا توجد بيانات في قاعدة Firebase.";
+        }
+      })
+      .catch(error => {
+        outputDiv.textContent = "خطأ في قراءة البيانات: " + error.message;
+        console.error("Firebase error:", error);
+      });
+  </script>
+
+</body>
+</html>
