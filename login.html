@@ -2,58 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>تسجيل الدخول برقم الهاتف</title>
-
-  <script type="module">
-    // استيراد Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
-
-    // إعدادات Firebase الخاصة بك
-    const firebaseConfig = {
-      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
-      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
-      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
-      projectId: "abu-shawqi-bouquets",
-      storageBucket: "abu-shawqi-bouquets.appspot.com",
-      messagingSenderId: "624365660732",
-      appId: "1:624365660732:web:da0b73e43cfde85a863139"
-    };
-
-    // تهيئة Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // التحقق من الرقم
-    window.loginWithPhone = async () => {
-      let phone = document.getElementById("phoneNumber").value.trim();
-
-      if (!phone) {
-        alert("❗ من فضلك أدخل رقم الهاتف");
-        return;
-      }
-
-      // إضافة +20 تلقائيًا إن لم يكن موجودًا
-      if (!phone.startsWith("+")) {
-        phone = "+20" + phone;
-      }
-
-      const phoneRef = ref(db, "allowedPhones/" + phone);
-      try {
-        const snapshot = await get(phoneRef);
-        if (snapshot.exists() && snapshot.val() === true) {
-          window.location.href = "home.html";
-          // هنا يمكنك التوجيه إلى صفحة المستخدم:
-          // window.location.href = "home.html";
-        } else {
-          alert("🚫 الرقم غير مصرح له بالدخول.");
-        }
-      } catch (error) {
-        alert("❌ حدث خطأ: " + error.message);
-      }
-    };
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <!-- Firebase SDK (بدون type="module") -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 
   <style>
     body {
@@ -89,5 +43,47 @@
   <br>
   <button onclick="loginWithPhone()">دخول</button>
 
+  <script>
+    // إعدادات Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
+      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
+      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
+      projectId: "abu-shawqi-bouquets",
+      storageBucket: "abu-shawqi-bouquets.appspot.com",
+      messagingSenderId: "624365660732",
+      appId: "1:624365660732:web:da0b73e43cfde85a863139"
+    };
+
+    // تهيئة Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function loginWithPhone() {
+      let phone = document.getElementById("phoneNumber").value.trim();
+
+      if (!phone) {
+        alert("❗ أدخل رقم الهاتف");
+        return;
+      }
+
+      if (!phone.startsWith("+")) {
+        phone = "+20" + phone;
+      }
+
+      firebase.database().ref("allowedPhones/" + phone).get()
+        .then((snapshot) => {
+          if (snapshot.exists() && snapshot.val() === true) {
+            // ✅ نجاح الدخول
+            window.location.href = "home.html";
+          } else {
+            alert("🚫 الرقم غير مصرح له بالدخول.");
+          }
+        })
+        .catch((error) => {
+          alert("❌ خطأ: " + error.message);
+        });
+    }
+  </script>
 </body>
 </html>
