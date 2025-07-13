@@ -2,10 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>تسجيل الدخول برقم الهاتف</title>
-
-  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
     import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
@@ -40,13 +38,12 @@
       const snapshot = await get(child(dbRef, "allowedPhones/" + phone));
       if (snapshot.exists()) {
         alert("✅ مرحبًا بك! تم تسجيل الدخول.");
-        window.location.href = "home.html"; // توجيه إلى الصفحة المطلوبة
+        window.location.href = "home.html"; // وجه المستخدم للصفحة المطلوبة
       } else {
         alert("❌ هذا الرقم غير مصرح له بالدخول.");
       }
     };
   </script>
-
   <style>
     body {
       font-family: 'Cairo', sans-serif;
@@ -67,7 +64,7 @@
 
   <h2>تسجيل الدخول برقم الهاتف</h2>
   <input type="text" id="phone" placeholder="مثال: 0123456789" />
-  <br/>
+  <br />
   <button onclick="login()">🚪 دخول</button>
 
 </body>
