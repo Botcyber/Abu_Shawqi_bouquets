@@ -14,36 +14,46 @@
 
     body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      margin: 0;
+      padding: 0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 0;
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 800% 800%;
+      animation: oceanWaves 20s ease infinite;
+    }
+
+    @keyframes oceanWaves {
+      0% { background-position: 0% 100%; }
+      50% { background-position: 100% 0%; }
+      100% { background-position: 0% 100%; }
     }
 
     h1 {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 900;
-      color: #fff;
-      text-shadow: 0 0 10px #fff, 0 0 20px #ff5e78, 0 0 30px #ff5e78;
-      margin-bottom: 40px;
-      animation: glow 2s infinite alternate;
+      color: white;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #fff, 0 0 25px #f0f, 0 0 35px #0ff;
+      animation: pulseGlow 3s infinite ease-in-out, slideText 4s infinite alternate;
     }
 
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 10px #fff, 0 0 20px #ff5e78, 0 0 30px #ff5e78;
-      }
-      to {
-        text-shadow: 0 0 20px #fff, 0 0 40px #ff5e78, 0 0 60px #ff5e78;
-      }
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #0ff; }
+      100% { text-shadow: 0 0 25px #fff, 0 0 40px #f0f, 0 0 55px #0ff; }
+    }
+
+    @keyframes slideText {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
     }
 
     .container {
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 30px;
       width: 90%;
       max-width: 400px;
@@ -83,6 +93,7 @@
       margin-top: 15px;
       font-size: 16px;
       min-height: 24px;
+      color: red;
     }
   </style>
 </head>
@@ -124,7 +135,6 @@
         return;
       }
 
-      // إزالة +20 لو موجود
       if (phone.startsWith('+20')) {
         phone = phone.slice(3);
       }
