@@ -4,11 +4,8 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
-  <!-- Firebase SDK (بدون type="module") -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
-
   <style>
     body {
       font-family: 'Cairo', sans-serif;
@@ -34,6 +31,12 @@
     button:hover {
       background-color: #218838;
     }
+    #message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: red;
+      min-height: 24px;
+    }
   </style>
 </head>
 <body>
@@ -43,8 +46,9 @@
   <br>
   <button onclick="loginWithPhone()">دخول</button>
 
+  <div id="message"></div>
+
   <script>
-    // إعدادات Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -55,15 +59,21 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
-    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function loginWithPhone() {
-      let phone = document.getElementById("phoneNumber").value.trim();
+    function showMessage(msg, isError = true) {
+      const div = document.getElementById('message');
+      div.style.color = isError ? 'red' : 'green';
+      div.textContent = msg;
+    }
 
+    function loginWithPhone() {
+      showMessage(''); // امسح الرسالة السابقة
+
+      let phone = document.getElementById("phoneNumber").value.trim();
       if (!phone) {
-        alert("❗ أدخل رقم الهاتف");
+        showMessage("❗ من فضلك أدخل رقم الهاتف");
         return;
       }
 
@@ -71,19 +81,25 @@
         phone = "+20" + phone;
       }
 
+      showMessage("⏳ جارٍ التحقق من الرقم...", false);
+
       firebase.database().ref("allowedPhones/" + phone).get()
         .then((snapshot) => {
           if (snapshot.exists() && snapshot.val() === true) {
-            // ✅ نجاح الدخول
-            window.location.href = "home.html";
+            showMessage("✅ تم التحقق، سيتم التحويل الآن...", false);
+            setTimeout(() => {
+              window.location.href = "home.html";
+            }, 1000);
           } else {
-            alert("🚫 الرقم غير مصرح له بالدخول.");
+            showMessage("🚫 الرقم غير مصرح له بالدخول.");
           }
         })
         .catch((error) => {
-          alert("❌ خطأ: " + error.message);
+          showMessage("❌ حدث خطأ: " + error.message);
+          console.error(error);
         });
     }
   </script>
+
 </body>
 </html>
