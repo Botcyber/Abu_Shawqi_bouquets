@@ -7,9 +7,10 @@
 
   <!-- Firebase SDKs -->
   <script type="module">
-    // استيراد Firebase (باستخدام ES Modules)
+    // استيراد Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
 
     // إعدادات Firebase
     const firebaseConfig = {
@@ -26,6 +27,7 @@
     // تهيئة Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getDatabase(app);
 
     // تهيئة reCAPTCHA
     window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
@@ -37,6 +39,7 @@
 
     let confirmationResult;
 
+    // إرسال الكود
     window.sendOTP = function () {
       const phoneNumber = document.getElementById("phoneNumber").value;
       signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
@@ -44,20 +47,32 @@
           confirmationResult = result;
           document.getElementById("login-form").style.display = "none";
           document.getElementById("verify-form").style.display = "block";
-          alert("تم إرسال الكود إلى رقم الهاتف.");
+          alert("✅ تم إرسال الكود إلى رقم الهاتف.");
         }).catch((error) => {
-          alert("خطأ: " + error.message);
+          alert("❌ خطأ: " + error.message);
         });
     };
 
+    // التحقق من الكود + الحفظ في قاعدة البيانات
     window.verifyOTP = function () {
       const otp = document.getElementById("otp").value;
       confirmationResult.confirm(otp).then((result) => {
         const user = result.user;
-        alert("تم تسجيل الدخول بنجاح! رقمك: " + user.phoneNumber);
-        // يمكن توجيه المستخدم هنا إلى صفحة الحساب مثلاً
+
+        // حفظ بيانات المستخدم في Realtime Database
+        set(ref(db, 'users/' + user.uid), {
+          uid: user.uid,
+          phone: user.phoneNumber,
+          loginTime: new Date().toISOString()
+        }).then(() => {
+          alert("✅ تم تسجيل الدخول وتخزين البيانات بنجاح!");
+          window.location.href = "home.html";
+        }).catch((error) => {
+          alert("❌ تم الدخول لكن فشل التخزين: " + error.message);
+        });
+
       }).catch((error) => {
-        alert("الكود غير صحيح أو منتهي: " + error.message);
+        alert("❌ الكود غير صحيح أو منتهي: " + error.message);
       });
     };
   </script>
@@ -88,12 +103,12 @@
   <div id="login-form">
     <input type="text" id="phoneNumber" placeholder="مثال: +201234567890" />
     <div id="recaptcha-container"></div>
-    <button onclick="sendOTP()">إرسال الكود</button>
+    <button onclick="sendOTP()">📤 إرسال الكود</button>
   </div>
 
   <div id="verify-form" style="display:none;">
-    <input type="text" id="otp" placeholder="ادخل الكود المرسل" />
-    <button onclick="verifyOTP()">تأكيد الكود</button>
+    <input type="text" id="otp" placeholder="🔐 ادخل الكود المرسل" />
+    <button onclick="verifyOTP()">✅ تأكيد الكود</button>
   </div>
 
 </body>
