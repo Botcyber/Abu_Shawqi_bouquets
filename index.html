@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+  
+  <!-- Firebase SDKs compat (جربت أحدث نسخة 9.23.0) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
   <style>
     body { font-family: 'Cairo', sans-serif; padding: 30px; background: #f9f9f9; text-align: center; }
     input, button { width: 90%; max-width: 300px; padding: 12px; font-size: 18px; margin: 10px auto; border: 1px solid #ccc; border-radius: 6px; display: block; }
@@ -44,6 +47,7 @@
     async function loginWithPhone() {
       let phone = document.getElementById('phoneNumber').value.trim();
       console.log("رقم الهاتف المدخل:", phone);
+
       if (!phone) {
         showMessage('❗ من فضلك أدخل رقم الهاتف');
         return;
@@ -67,13 +71,13 @@
           showMessage('✅ رقمك مسجل! جاري الدخول...', false);
           setTimeout(() => {
             window.location.href = 'home.html';
-          }, 1000);
+          }, 1200);
         } else {
           showMessage('🚫 رقمك غير موجود في قاعدة البيانات.');
         }
       } catch (error) {
         showMessage('❌ حدث خطأ في الاتصال بقاعدة البيانات.');
-        console.error(error);
+        console.error("خطأ الاتصال:", error);
       }
     }
   </script>
