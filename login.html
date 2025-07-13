@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Firebase SDK بدون type="module" -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
@@ -34,7 +37,6 @@
     #message {
       margin-top: 20px;
       font-size: 18px;
-      color: red;
       min-height: 24px;
     }
   </style>
@@ -45,10 +47,10 @@
   <input type="text" id="phoneNumber" placeholder="أدخل رقمك بدون +20" />
   <br>
   <button onclick="loginWithPhone()">دخول</button>
-
   <div id="message"></div>
 
   <script>
+    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -59,6 +61,7 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
+    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -69,7 +72,7 @@
     }
 
     function loginWithPhone() {
-      showMessage(''); // امسح الرسالة السابقة
+      showMessage('');
 
       let phone = document.getElementById("phoneNumber").value.trim();
       if (!phone) {
@@ -82,11 +85,12 @@
       }
 
       showMessage("⏳ جارٍ التحقق من الرقم...", false);
+      console.log("جاري التحقق من الرقم:", phone);
 
-      firebase.database().ref("allowedPhones/" + phone).get()
+      db.ref("allowedPhones/" + phone).get()
         .then((snapshot) => {
           if (snapshot.exists() && snapshot.val() === true) {
-            showMessage("✅ تم التحقق، سيتم التحويل الآن...", false);
+            showMessage("✅ تم التحقق، سيتم الدخول الآن...", false);
             setTimeout(() => {
               window.location.href = "home.html";
             }, 1000);
@@ -95,8 +99,8 @@
           }
         })
         .catch((error) => {
+          console.error("خطأ في قراءة البيانات:", error);
           showMessage("❌ حدث خطأ: " + error.message);
-          console.error(error);
         });
     }
   </script>
