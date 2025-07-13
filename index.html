@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-  <!-- Firebase SDK بدون type="module" -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 
@@ -61,7 +59,6 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
-    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -69,6 +66,7 @@
       const div = document.getElementById('message');
       div.style.color = isError ? 'red' : 'green';
       div.textContent = msg;
+      console.log(msg);
     }
 
     function loginWithPhone() {
@@ -84,23 +82,27 @@
         phone = "+20" + phone;
       }
 
-      showMessage("⏳ جارٍ التحقق من الرقم...", false);
-      console.log("جاري التحقق من الرقم:", phone);
+      showMessage("⏳ جاري التحقق من الرقم: " + phone, false);
+      console.log("🔍 يتم فحص:", phone);
 
-      db.ref("allowedPhones/" + phone).get()
-        .then((snapshot) => {
+      const path = "allowedPhones/" + phone;
+
+      db.ref(path).get()
+        .then(snapshot => {
+          console.log("📦 snapshot:", snapshot.exists(), snapshot.val());
+
           if (snapshot.exists() && snapshot.val() === true) {
-            showMessage("✅ تم التحقق، سيتم الدخول الآن...", false);
+            showMessage("✅ الرقم موجود، يتم التوجيه...", false);
             setTimeout(() => {
               window.location.href = "home.html";
             }, 1000);
           } else {
-            showMessage("🚫 الرقم غير مصرح له بالدخول.");
+            showMessage("🚫 الرقم غير موجود في قاعدة البيانات.");
           }
         })
-        .catch((error) => {
-          console.error("خطأ في قراءة البيانات:", error);
-          showMessage("❌ حدث خطأ: " + error.message);
+        .catch(error => {
+          console.error("❌ خطأ Firebase:", error);
+          showMessage("❌ حدث خطأ في الاتصال بـ Firebase: " + error.message);
         });
     }
   </script>
