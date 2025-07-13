@@ -5,7 +5,6 @@
   <title>لوحة إدارة الأرقام</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 
@@ -16,65 +15,37 @@
       padding: 30px;
       text-align: center;
     }
-
-    h2 {
-      color: #333;
-      margin-bottom: 20px;
-    }
-
+    h2 { color: #333; margin-bottom: 20px; }
     input, button {
-      padding: 12px;
-      margin: 10px auto;
-      font-size: 16px;
-      border-radius: 6px;
+      padding: 12px; margin: 10px auto;
+      font-size: 16px; border-radius: 6px;
       border: 1px solid #ccc;
-      width: 90%;
-      max-width: 300px;
+      width: 90%; max-width: 300px;
       display: block;
     }
-
     button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
+      background: #28a745; color: white;
+      border: none; cursor: pointer;
     }
-
-    button:hover {
-      background-color: #218838;
-    }
-
+    button:hover { background: #218838; }
     ul {
-      list-style: none;
-      padding: 0;
+      list-style: none; padding: 0;
       margin-top: 30px;
     }
-
     li {
-      background: white;
-      margin: 10px auto;
-      padding: 12px;
-      width: 90%;
-      max-width: 320px;
+      background: white; margin: 10px auto;
+      padding: 12px; width: 90%; max-width: 320px;
       border-radius: 6px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
+      display: flex; justify-content: space-between;
       align-items: center;
     }
-
     .delete-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
+      background: #dc3545; color: white;
+      border: none; padding: 6px 12px;
+      border-radius: 4px; cursor: pointer;
     }
-
-    .delete-btn:hover {
-      background: #c82333;
-    }
+    .delete-btn:hover { background: #c82333; }
   </style>
 </head>
 <body>
@@ -86,7 +57,6 @@
   <ul id="phoneList"></ul>
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -96,80 +66,42 @@
       messagingSenderId: "624365660732",
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     function addPhone() {
-      const input = document.getElementById('phoneInput');
-      let phone = input.value.trim();
-
-      if (!phone) {
-        alert("❗ من فضلك أدخل رقم الهاتف");
-        return;
-      }
-
-      if (phone.startsWith('+20')) {
-        phone = phone.slice(3); // إزالة +20 إذا موجودة
-      }
-
+      const phone = document.getElementById('phoneInput').value.trim();
+      if (!phone) return alert("❗ من فضلك أدخل رقم الهاتف");
       db.ref('allowedPhones/' + phone).set(true)
-        .then(() => {
-          alert("✅ تم إضافة الرقم: " + phone);
-          input.value = "";
-          loadPhones();
-        })
-        .catch(err => {
-          alert("❌ خطأ في الإضافة: " + err.message);
-        });
+        .then(() => { alert("✅ تم إضافة الرقم"); loadPhones(); })
+        .catch(err => alert("❌ خطأ: " + err.message));
     }
 
     function loadPhones() {
       const phoneList = document.getElementById('phoneList');
       phoneList.innerHTML = "جاري تحميل الأرقام...";
-
       db.ref('allowedPhones').once('value')
-        .then(snapshot => {
-          phoneList.innerHTML = "";
-          const data = snapshot.val();
-
-          if (!data) {
-            phoneList.innerHTML = "<li>لا توجد أرقام مضافة بعد</li>";
-            return;
-          }
-
+        .then(snap => {
+          phoneList.innerHTML = '';
+          const data = snap.val();
+          if (!data) return phoneList.innerHTML = "<li>لا توجد أرقام.</li>";
           Object.keys(data).forEach(phone => {
             const li = document.createElement('li');
-            li.innerHTML = `
-              ${phone}
-              <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>
-            `;
+            li.innerHTML = `${phone} <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>`;
             phoneList.appendChild(li);
           });
         })
-        .catch(err => {
-          phoneList.innerHTML = "<li>❌ فشل تحميل الأرقام</li>";
-          console.error(err);
-        });
+        .catch(() => phoneList.innerHTML = "<li>❌ خطأ في التحميل</li>");
     }
 
     function deletePhone(phone) {
-      if (!confirm("هل تريد حذف الرقم: " + phone + " ؟")) return;
-
+      if (!confirm("حذف " + phone + "؟")) return;
       db.ref('allowedPhones/' + phone).remove()
-        .then(() => {
-          alert("🗑️ تم الحذف بنجاح");
-          loadPhones();
-        })
-        .catch(err => {
-          alert("❌ خطأ أثناء الحذف: " + err.message);
-        });
+        .then(() => { alert("🗑️ تم الحذف"); loadPhones(); })
+        .catch(err => alert("❌ خطأ: " + err.message));
     }
 
-    // تحميل الأرقام عند التشغيل
     window.onload = loadPhones;
   </script>
-
 </body>
 </html>
