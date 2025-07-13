@@ -148,8 +148,11 @@
 
         if (snapshot.exists() && snapshot.val() === true) {
           showMessage('✅ رقمك مسجل! جاري الدخول...', false);
+          
+          sessionStorage.setItem("userPhone", phone);
+          
           setTimeout(() => {
-            window.location.href = 'home.html';
+            window.location.href = 'Home.html';
           }, 1200);
         } else {
           showMessage('🚫 رقمك غير موجود في النظام.');
