@@ -2,12 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>تسجيل الدخول برقم الهاتف</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
 
+  <script type="module">
+    // استيراد Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+
+    // إعدادات Firebase الخاصة بك
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -18,58 +21,73 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
+    // تهيئة Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.login = async function () {
+    // التحقق من الرقم
+    window.loginWithPhone = async () => {
+      let phone = document.getElementById("phoneNumber").value.trim();
+
+      if (!phone) {
+        alert("❗ من فضلك أدخل رقم الهاتف");
+        return;
+      }
+
+      // إضافة +20 تلقائيًا إن لم يكن موجودًا
+      if (!phone.startsWith("+")) {
+        phone = "+20" + phone;
+      }
+
+      const phoneRef = ref(db, "allowedPhones/" + phone);
       try {
-        let phone = document.getElementById("phone").value.trim();
-
-        if (phone === "") {
-          alert("📱 يرجى إدخال رقم الهاتف");
-          return;
-        }
-
-        if (!phone.startsWith("+")) {
-          phone = "+20" + phone;
-        }
-
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, "allowedPhones/" + phone));
-        if (snapshot.exists()) {
-          alert("✅ مرحبًا بك! تم تسجيل الدخول.");
-          window.location.href = "home.html"; // عدل الرابط للوجهة المناسبة
+        const snapshot = await get(phoneRef);
+        if (snapshot.exists() && snapshot.val() === true) {
+          alert("✅ مرحبًا! تم السماح بالدخول لرقمك: " + phone);
+          // هنا يمكنك التوجيه إلى صفحة المستخدم:
+          // window.location.href = "home.html";
         } else {
-          alert("❌ هذا الرقم غير مصرح له بالدخول.");
+          alert("🚫 الرقم غير مصرح له بالدخول.");
         }
       } catch (error) {
-        alert("❌ حدث خطأ أثناء محاولة تسجيل الدخول: " + error.message);
-        console.error(error);
+        alert("❌ حدث خطأ: " + error.message);
       }
     };
   </script>
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: #f5f5f5;
-      padding: 40px;
+      padding: 30px;
+      background: #f9f9f9;
       text-align: center;
     }
     input, button {
       padding: 12px;
+      font-size: 18px;
       margin: 10px;
-      font-size: 16px;
-      width: 80%;
-      max-width: 300px;
+      width: 90%;
+      max-width: 320px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
 
   <h2>تسجيل الدخول برقم الهاتف</h2>
-  <input type="text" id="phone" placeholder="مثال: 0123456789" />
-  <br />
-  <button onclick="login()">🚪 دخول</button>
+  <input type="text" id="phoneNumber" placeholder="أدخل رقمك بدون +20" />
+  <br>
+  <button onclick="loginWithPhone()">دخول</button>
 
 </body>
 </html>
