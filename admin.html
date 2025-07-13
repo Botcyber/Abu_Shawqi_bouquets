@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>لوحة تحكم الأرقام المسموح بها</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getDatabase, ref, set, remove, get } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
+      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
+      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
+      projectId: "abu-shawqi-bouquets",
+      storageBucket: "abu-shawqi-bouquets.appspot.com",
+      messagingSenderId: "624365660732",
+      appId: "1:624365660732:web:da0b73e43cfde85a863139"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.addPhone = async () => {
+      let phone = document.getElementById('phone').value.trim();
+      if (!phone) {
+        alert('⚠️ الرجاء إدخال رقم هاتف.');
+        return;
+      }
+      // إضافة +20 تلقائيًا إذا لم يبدأ الرقم بـ +20
+      if (!phone.startsWith("+20")) {
+        phone = "+20" + phone;
+      }
+      await set(ref(db, 'allowedPhones/' + phone), true);
+      alert('✅ تم إضافة الرقم: ' + phone);
+      document.getElementById('phone').value = '';
+      loadPhones();
+    };
+
+    window.deletePhone = async (phone) => {
+      if (confirm(`هل تريد حذف الرقم ${phone}؟`)) {
+        await remove(ref(db, 'allowedPhones/' + phone));
+        alert('✅ تم حذف الرقم.');
+        loadPhones();
+      }
+    };
+
+    window.loadPhones = async () => {
+      const list = document.getElementById('phonesList');
+      list.innerHTML = 'جاري التحميل...';
+      const snapshot = await get(ref(db, 'allowedPhones'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        list.innerHTML = '';
+        Object.keys(data).forEach(phone => {
+          const li = document.createElement('li');
+          li.textContent = phone + ' ';
+          const btn = document.createElement('button');
+          btn.textContent = 'حذف';
+          btn.style.marginLeft = '10px';
+          btn.onclick = () => deletePhone(phone);
+          li.appendChild(btn);
+          list.appendChild(li);
+        });
+      } else {
+        list.innerHTML = 'لا توجد أرقام مسموح بها.';
+      }
+    };
+
+    window.onload = () => {
+      loadPhones();
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+      background: #fafafa;
+      max-width: 500px;
+      margin: auto;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #fff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    button {
+      background: #d9534f;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 6px 12px;
+    }
+    button:hover {
+      background: #c9302c;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>لوحة تحكم الأرقام المسموح بها</h2>
+
+  <input type="text" id="phone" placeholder="أدخل رقم الهاتف بدون +20، مثلاً 0123456789" />
+  <button onclick="addPhone()">➕ إضافة رقم</button>
+
+  <h3>الأرقام المسموح بها:</h3>
+  <ul id="phonesList">
+    جاري التحميل...
+  </ul>
+
+</body>
+</html>
