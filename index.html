@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 
@@ -11,7 +13,7 @@
     body {
       font-family: 'Cairo', sans-serif;
       padding: 30px;
-      background: #f9f9f9;
+      background: #f2f2f2;
       text-align: center;
     }
     input, button {
@@ -59,6 +61,7 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
+    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -92,12 +95,12 @@
           console.log("📦 snapshot:", snapshot.exists(), snapshot.val());
 
           if (snapshot.exists() && snapshot.val() === true) {
-            showMessage("✅ الرقم موجود، يتم التوجيه...", false);
+            showMessage("✅ رقمك متسجل! يتم تحويلك الآن...", false);
             setTimeout(() => {
               window.location.href = "home.html";
             }, 1000);
           } else {
-            showMessage("🚫 الرقم غير موجود في قاعدة البيانات.");
+            showMessage("🚫 رقمك غير موجود في قاعدة البيانات.");
           }
         })
         .catch(error => {
