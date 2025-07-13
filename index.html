@@ -4,43 +4,14 @@
   <meta charset="UTF-8" />
   <title>تسجيل الدخول برقم الهاتف</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-  <!-- Firebase SDKs compat -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
-
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      padding: 30px;
-      background: #f9f9f9;
-      text-align: center;
-    }
-    input, button {
-      width: 90%;
-      max-width: 300px;
-      padding: 12px;
-      font-size: 18px;
-      margin: 10px auto;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      display: block;
-    }
-    button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    #message {
-      margin-top: 20px;
-      font-size: 18px;
-      min-height: 28px;
-      color: red;
-    }
+    body { font-family: 'Cairo', sans-serif; padding: 30px; background: #f9f9f9; text-align: center; }
+    input, button { width: 90%; max-width: 300px; padding: 12px; font-size: 18px; margin: 10px auto; border: 1px solid #ccc; border-radius: 6px; display: block; }
+    button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #218838; }
+    #message { margin-top: 20px; font-size: 18px; min-height: 28px; color: red; }
   </style>
 </head>
 <body>
@@ -51,7 +22,6 @@
   <div id="message"></div>
 
   <script>
-    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -62,7 +32,6 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
-    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -72,8 +41,9 @@
       div.style.color = isError ? 'red' : 'green';
     }
 
-    function loginWithPhone() {
+    async function loginWithPhone() {
       let phone = document.getElementById('phoneNumber').value.trim();
+      console.log("رقم الهاتف المدخل:", phone);
       if (!phone) {
         showMessage('❗ من فضلك أدخل رقم الهاتف');
         return;
@@ -86,21 +56,25 @@
       showMessage('⏳ جاري التحقق من الرقم...', false);
 
       const refPath = 'allowedPhones/' + phone;
-      db.ref(refPath).get()
-        .then(snapshot => {
-          if (snapshot.exists() && snapshot.val() === true) {
-            showMessage('✅ رقمك مسجل! جاري الدخول...', false);
-            setTimeout(() => {
-              window.location.href = 'home.html';
-            }, 1200);
-          } else {
-            showMessage('🚫 رقمك غير موجود في قاعدة البيانات.');
-          }
-        })
-        .catch(error => {
-          showMessage('❌ حدث خطأ في الاتصال بقاعدة البيانات.');
-          console.error(error);
-        });
+      console.log("مسار قراءة البيانات:", refPath);
+
+      try {
+        const snapshot = await db.ref(refPath).get();
+        console.log("Snapshot exists:", snapshot.exists());
+        console.log("Snapshot val:", snapshot.val());
+
+        if (snapshot.exists() && snapshot.val() === true) {
+          showMessage('✅ رقمك مسجل! جاري الدخول...', false);
+          setTimeout(() => {
+            window.location.href = 'home.html';
+          }, 1000);
+        } else {
+          showMessage('🚫 رقمك غير موجود في قاعدة البيانات.');
+        }
+      } catch (error) {
+        showMessage('❌ حدث خطأ في الاتصال بقاعدة البيانات.');
+        console.error(error);
+      }
     }
   </script>
 
