@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>لوحة إدارة الأرقام</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
@@ -12,13 +12,13 @@
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: #f1f1f1;
+      background: #f9f9f9;
       padding: 30px;
       text-align: center;
     }
 
     h2 {
-      color: #444;
+      color: #333;
       margin-bottom: 20px;
     }
 
@@ -47,17 +47,17 @@
     ul {
       list-style: none;
       padding: 0;
-      margin-top: 20px;
+      margin-top: 30px;
     }
 
     li {
       background: white;
-      padding: 12px;
       margin: 10px auto;
+      padding: 12px;
       width: 90%;
       max-width: 320px;
       border-radius: 6px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -79,14 +79,14 @@
 </head>
 <body>
 
-  <h2>لوحة التحكم - أرقام مسموح بها</h2>
-  <input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف بدون +20">
+  <h2>لوحة التحكم - الأرقام المسموح بها</h2>
+  <input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف بدون +20" />
   <button onclick="addPhone()">إضافة الرقم</button>
 
   <ul id="phoneList"></ul>
 
   <script>
-    // إعداد Firebase
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -97,40 +97,45 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // إضافة رقم
     function addPhone() {
       const input = document.getElementById('phoneInput');
-      const phone = input.value.trim();
+      let phone = input.value.trim();
 
       if (!phone) {
-        alert("❗ يرجى إدخال رقم الهاتف");
+        alert("❗ من فضلك أدخل رقم الهاتف");
         return;
+      }
+
+      if (phone.startsWith('+20')) {
+        phone = phone.slice(3); // إزالة +20 إذا موجودة
       }
 
       db.ref('allowedPhones/' + phone).set(true)
         .then(() => {
-          alert("✅ تم إضافة الرقم بنجاح");
-          input.value = '';
+          alert("✅ تم إضافة الرقم: " + phone);
+          input.value = "";
           loadPhones();
         })
-        .catch(error => {
-          alert("❌ فشل في الإضافة: " + error.message);
+        .catch(err => {
+          alert("❌ خطأ في الإضافة: " + err.message);
         });
     }
 
-    // تحميل الأرقام
     function loadPhones() {
+      const phoneList = document.getElementById('phoneList');
+      phoneList.innerHTML = "جاري تحميل الأرقام...";
+
       db.ref('allowedPhones').once('value')
         .then(snapshot => {
-          const phoneList = document.getElementById('phoneList');
-          phoneList.innerHTML = '';
-          
+          phoneList.innerHTML = "";
           const data = snapshot.val();
+
           if (!data) {
-            phoneList.innerHTML = '<li>لا توجد أرقام مضافة</li>';
+            phoneList.innerHTML = "<li>لا توجد أرقام مضافة بعد</li>";
             return;
           }
 
@@ -142,24 +147,27 @@
             `;
             phoneList.appendChild(li);
           });
+        })
+        .catch(err => {
+          phoneList.innerHTML = "<li>❌ فشل تحميل الأرقام</li>";
+          console.error(err);
         });
     }
 
-    // حذف رقم
     function deletePhone(phone) {
-      if (confirm("هل تريد حذف الرقم " + phone + " ؟")) {
-        db.ref('allowedPhones/' + phone).remove()
-          .then(() => {
-            alert("🗑️ تم حذف الرقم");
-            loadPhones();
-          })
-          .catch(error => {
-            alert("❌ خطأ أثناء الحذف: " + error.message);
-          });
-      }
+      if (!confirm("هل تريد حذف الرقم: " + phone + " ؟")) return;
+
+      db.ref('allowedPhones/' + phone).remove()
+        .then(() => {
+          alert("🗑️ تم الحذف بنجاح");
+          loadPhones();
+        })
+        .catch(err => {
+          alert("❌ خطأ أثناء الحذف: " + err.message);
+        });
     }
 
-    // تحميل الأرقام عند الفتح
+    // تحميل الأرقام عند التشغيل
     window.onload = loadPhones;
   </script>
 
