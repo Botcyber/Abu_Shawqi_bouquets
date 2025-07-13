@@ -1,52 +1,45 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>لوحة تحكم الأرقام</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background-color: #f2f2f2;
-      padding: 30px;
+      background: #f8f8f8;
+      padding: 20px;
       text-align: center;
     }
-
-    h2 {
-      color: #333;
-      margin-bottom: 20px;
-    }
-
-    input {
+    h2 { color: #333; }
+    input, button {
       padding: 10px;
       font-size: 16px;
-      width: 250px;
-      margin-bottom: 10px;
-      border-radius: 8px;
+      margin: 10px auto;
+      width: 80%;
+      max-width: 300px;
+      display: block;
+      border-radius: 6px;
       border: 1px solid #ccc;
     }
-
     button {
-      padding: 10px 20px;
-      font-size: 16px;
       background: #28a745;
       color: white;
       border: none;
-      border-radius: 8px;
       cursor: pointer;
-      margin: 5px;
     }
-
     button:hover {
       background: #218838;
     }
-
     ul {
       list-style: none;
       padding: 0;
       margin-top: 20px;
     }
-
     li {
       background: #fff;
       margin: 8px auto;
@@ -58,11 +51,14 @@
       align-items: center;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-
     .delete-btn {
       background: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
     }
-
     .delete-btn:hover {
       background: #c82333;
     }
@@ -71,15 +67,12 @@
 <body>
 
   <h2>لوحة تحكم الأرقام</h2>
-  <input type="text" id="phone" placeholder="أدخل رقم الهاتف بدون +20" />
+  <input type="text" id="phone" placeholder="أدخل رقم الهاتف بدون +20">
   <button onclick="addPhone()">إضافة</button>
 
   <ul id="phoneList"></ul>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
-
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -90,58 +83,61 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const phonesRef = ref(db, 'allowedPhones');
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // إضافة رقم
-    window.addPhone = () => {
-      let phone = document.getElementById('phone').value.trim();
+    function addPhone() {
+      const input = document.getElementById('phone');
+      const phone = input.value.trim();
       if (!phone) return alert("❗ أدخل رقم الهاتف");
 
-      // حفظ الرقم بدون +20 في الواجهة، وإضافة +20 داخليًا
-      const fullPhone = "+20" + phone;
-
-      set(ref(db, 'allowedPhones/' + fullPhone), true)
+      db.ref('allowedPhones/' + phone).set(true)
         .then(() => {
-          alert("✅ تمت إضافة الرقم بنجاح");
-          document.getElementById('phone').value = "";
+          alert("✅ تم إضافة الرقم بنجاح");
+          input.value = '';
+          loadPhones();
         })
         .catch(err => alert("❌ خطأ: " + err.message));
-    };
+    }
 
-    // عرض الأرقام
-    onValue(phonesRef, snapshot => {
-      const phoneList = document.getElementById('phoneList');
-      phoneList.innerHTML = '';
+    function loadPhones() {
+      db.ref('allowedPhones').once('value')
+        .then(snapshot => {
+          const phoneList = document.getElementById('phoneList');
+          phoneList.innerHTML = '';
 
-      if (!snapshot.exists()) {
-        phoneList.innerHTML = '<li>لا يوجد أرقام مضافة</li>';
-        return;
+          const data = snapshot.val();
+          if (!data) {
+            phoneList.innerHTML = '<li>لا توجد أرقام مسجلة</li>';
+            return;
+          }
+
+          Object.keys(data).forEach(phone => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              ${phone}
+              <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>
+            `;
+            phoneList.appendChild(li);
+          });
+        })
+        .catch(error => {
+          alert("❌ خطأ أثناء تحميل الأرقام: " + error.message);
+        });
+    }
+
+    function deletePhone(phone) {
+      if (confirm("هل تريد حذف الرقم " + phone + " ؟")) {
+        db.ref('allowedPhones/' + phone).remove()
+          .then(() => {
+            alert("🗑️ تم حذف الرقم");
+            loadPhones();
+          })
+          .catch(err => alert("❌ خطأ أثناء الحذف: " + err.message));
       }
+    }
 
-      const data = snapshot.val();
-      Object.keys(data).forEach(fullPhone => {
-        const item = document.createElement('li');
-        const shortPhone = fullPhone.replace('+20', '');
-
-        item.innerHTML = `
-          ${shortPhone}
-          <button class="delete-btn" onclick="deletePhone('${fullPhone}')">حذف</button>
-        `;
-        phoneList.appendChild(item);
-      });
-    });
-
-    // حذف رقم
-    window.deletePhone = (fullPhone) => {
-      if (confirm("هل أنت متأكد من حذف الرقم؟")) {
-        remove(ref(db, 'allowedPhones/' + fullPhone))
-          .then(() => alert("🗑️ تم حذف الرقم"))
-          .catch(err => alert("❌ خطأ: " + err.message));
-      }
-    };
+    window.onload = loadPhones;
   </script>
-
 </body>
 </html>
