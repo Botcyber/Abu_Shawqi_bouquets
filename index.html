@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>تسجيل الدخول برقم الهاتف</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      padding: 30px;
-      background: #f2f2f2;
+      background: #f0f0f0;
+      padding: 20px;
       text-align: center;
     }
     input, button {
+      width: 90%;
+      max-width: 300px;
       padding: 12px;
       font-size: 18px;
-      margin: 10px;
-      width: 90%;
-      max-width: 320px;
-      border-radius: 8px;
+      margin: 10px 0;
       border: 1px solid #ccc;
+      border-radius: 6px;
     }
     button {
-      background-color: #28a745;
+      background: #28a745;
       color: white;
-      border: none;
       cursor: pointer;
+      border: none;
     }
     button:hover {
-      background-color: #218838;
+      background: #218838;
     }
     #message {
-      margin-top: 20px;
-      font-size: 18px;
+      margin-top: 15px;
+      font-size: 16px;
       min-height: 24px;
     }
   </style>
 </head>
 <body>
 
-  <h2>تسجيل الدخول برقم الهاتف</h2>
-  <input type="text" id="phoneNumber" placeholder="أدخل رقمك بدون +20" />
+  <h2>تسجيل الدخول</h2>
+  <input id="phoneNumber" type="text" placeholder="اكتب رقمك بدون +20" />
   <br>
   <button onclick="loginWithPhone()">دخول</button>
   <div id="message"></div>
@@ -61,23 +61,19 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
-    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     function showMessage(msg, isError = true) {
-      const div = document.getElementById('message');
-      div.style.color = isError ? 'red' : 'green';
+      const div = document.getElementById("message");
       div.textContent = msg;
-      console.log(msg);
+      div.style.color = isError ? "red" : "green";
     }
 
     function loginWithPhone() {
-      showMessage('');
-
       let phone = document.getElementById("phoneNumber").value.trim();
       if (!phone) {
-        showMessage("❗ من فضلك أدخل رقم الهاتف");
+        showMessage("❗ أدخل رقم الهاتف");
         return;
       }
 
@@ -85,27 +81,23 @@
         phone = "+20" + phone;
       }
 
-      showMessage("⏳ جاري التحقق من الرقم: " + phone, false);
-      console.log("🔍 يتم فحص:", phone);
+      showMessage("⏳ جاري التحقق من الرقم...", false);
 
-      const path = "allowedPhones/" + phone;
-
-      db.ref(path).get()
+      const refPath = "allowedPhones/" + phone;
+      db.ref(refPath).get()
         .then(snapshot => {
-          console.log("📦 snapshot:", snapshot.exists(), snapshot.val());
-
           if (snapshot.exists() && snapshot.val() === true) {
-            showMessage("✅ رقمك متسجل! يتم تحويلك الآن...", false);
+            showMessage("✅ رقمك متسجل، يتم الدخول...", false);
             setTimeout(() => {
               window.location.href = "home.html";
             }, 1000);
           } else {
-            showMessage("🚫 رقمك غير موجود في قاعدة البيانات.");
+            showMessage("🚫 رقمك غير موجود أو غير مفعل.");
           }
         })
-        .catch(error => {
-          console.error("❌ خطأ Firebase:", error);
-          showMessage("❌ حدث خطأ في الاتصال بـ Firebase: " + error.message);
+        .catch(err => {
+          showMessage("❌ خطأ في الاتصال بـ Firebase", true);
+          console.error(err);
         });
     }
   </script>
