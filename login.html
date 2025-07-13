@@ -38,7 +38,7 @@
         const snapshot = await get(child(dbRef, "allowedPhones/" + phone));
         if (snapshot.exists()) {
           alert("✅ مرحبًا بك! تم تسجيل الدخول.");
-          window.location.href = "home.html"; // غير هذا إلى الصفحة التي تريد التوجيه إليها
+          window.location.href = "home.html"; // عدل الرابط للوجهة المناسبة
         } else {
           alert("❌ هذا الرقم غير مصرح له بالدخول.");
         }
