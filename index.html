@@ -43,8 +43,8 @@
 </head>
 <body>
 
-  <h2>تسجيل الدخول</h2>
-  <input id="phoneNumber" type="text" placeholder="اكتب رقمك بدون +20" />
+  <h2>تسجيل الدخول بالرقم</h2>
+  <input id="phoneNumber" type="text" placeholder="اكتب رقمك" />
   <br>
   <button onclick="loginWithPhone()">دخول</button>
   <div id="message"></div>
@@ -85,20 +85,23 @@
 
       const refPath = "allowedPhones/" + phone;
       db.ref(refPath).get()
-        .then(snapshot => {
-          if (snapshot.exists() && snapshot.val() === true) {
-            showMessage("✅ رقمك متسجل، يتم الدخول...", false);
-            setTimeout(() => {
-              window.location.href = "home.html";
-            }, 1000);
-          } else {
-            showMessage("🚫 رقمك غير موجود أو غير مفعل.");
-          }
-        })
-        .catch(err => {
-          showMessage("❌ خطأ في الاتصال بـ Firebase", true);
-          console.error(err);
-        });
+  .then(snapshot => {
+    console.log("snapshot.exists() =", snapshot.exists());
+    console.log("snapshot.val() =", snapshot.val());
+
+    if (snapshot.exists() && snapshot.val() === true) {
+      showMessage("✅ رقمك متسجل، يتم الدخول...", false);
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 1000);
+    } else {
+      showMessage("🚫 رقمك غير موجود في قاعدة البيانات.");
+    }
+  })
+  .catch(err => {
+    console.error("Firebase Error:", err);
+    showMessage("❌ خطأ في الاتصال بـ Firebase", true);
+  });
     }
   </script>
 
