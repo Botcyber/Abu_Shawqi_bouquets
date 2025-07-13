@@ -21,48 +21,62 @@
     const db = getDatabase(app);
 
     window.addPhone = async () => {
-      let phone = document.getElementById('phone').value.trim();
-      if (!phone) {
-        alert('⚠️ الرجاء إدخال رقم هاتف.');
-        return;
+      try {
+        let phone = document.getElementById('phone').value.trim();
+        if (!phone) {
+          alert('⚠️ الرجاء إدخال رقم هاتف.');
+          return;
+        }
+        if (!phone.startsWith("+20")) {
+          phone = "+20" + phone;
+        }
+        await set(ref(db, 'allowedPhones/' + phone), true);
+        alert('✅ تم إضافة الرقم: ' + phone);
+        document.getElementById('phone').value = '';
+        loadPhones();
+      } catch (error) {
+        alert('❌ حدث خطأ أثناء إضافة الرقم: ' + error.message);
+        console.error(error);
       }
-      // إضافة +20 تلقائيًا إذا لم يبدأ الرقم بـ +20
-      if (!phone.startsWith("+20")) {
-        phone = "+20" + phone;
-      }
-      await set(ref(db, 'allowedPhones/' + phone), true);
-      alert('✅ تم إضافة الرقم: ' + phone);
-      document.getElementById('phone').value = '';
-      loadPhones();
     };
 
     window.deletePhone = async (phone) => {
       if (confirm(`هل تريد حذف الرقم ${phone}؟`)) {
-        await remove(ref(db, 'allowedPhones/' + phone));
-        alert('✅ تم حذف الرقم.');
-        loadPhones();
+        try {
+          await remove(ref(db, 'allowedPhones/' + phone));
+          alert('✅ تم حذف الرقم.');
+          loadPhones();
+        } catch (error) {
+          alert('❌ حدث خطأ أثناء حذف الرقم: ' + error.message);
+          console.error(error);
+        }
       }
     };
 
     window.loadPhones = async () => {
-      const list = document.getElementById('phonesList');
-      list.innerHTML = 'جاري التحميل...';
-      const snapshot = await get(ref(db, 'allowedPhones'));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        list.innerHTML = '';
-        Object.keys(data).forEach(phone => {
-          const li = document.createElement('li');
-          li.textContent = phone + ' ';
-          const btn = document.createElement('button');
-          btn.textContent = 'حذف';
-          btn.style.marginLeft = '10px';
-          btn.onclick = () => deletePhone(phone);
-          li.appendChild(btn);
-          list.appendChild(li);
-        });
-      } else {
-        list.innerHTML = 'لا توجد أرقام مسموح بها.';
+      try {
+        const list = document.getElementById('phonesList');
+        list.innerHTML = 'جاري التحميل...';
+        const snapshot = await get(ref(db, 'allowedPhones'));
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          list.innerHTML = '';
+          Object.keys(data).forEach(phone => {
+            const li = document.createElement('li');
+            li.textContent = phone + ' ';
+            const btn = document.createElement('button');
+            btn.textContent = 'حذف';
+            btn.style.marginLeft = '10px';
+            btn.onclick = () => deletePhone(phone);
+            li.appendChild(btn);
+            list.appendChild(li);
+          });
+        } else {
+          list.innerHTML = 'لا توجد أرقام مسموح بها.';
+        }
+      } catch (error) {
+        alert('❌ حدث خطأ أثناء تحميل الأرقام: ' + error.message);
+        console.error(error);
       }
     };
 
