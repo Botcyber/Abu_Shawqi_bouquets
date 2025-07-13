@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>تسجيل الدخول برقم الهاتف الخاص بك</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>تسجيل الدخول برقم الهاتف</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs compat -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: #f0f0f0;
-      padding: 20px;
+      padding: 30px;
+      background: #f9f9f9;
       text-align: center;
     }
     input, button {
@@ -21,31 +21,32 @@
       max-width: 300px;
       padding: 12px;
       font-size: 18px;
-      margin: 10px 0;
+      margin: 10px auto;
       border: 1px solid #ccc;
       border-radius: 6px;
+      display: block;
     }
     button {
-      background: #28a745;
+      background-color: #28a745;
       color: white;
-      cursor: pointer;
       border: none;
+      cursor: pointer;
     }
     button:hover {
-      background: #218838;
+      background-color: #218838;
     }
     #message {
-      margin-top: 15px;
-      font-size: 16px;
-      min-height: 24px;
+      margin-top: 20px;
+      font-size: 18px;
+      min-height: 28px;
+      color: red;
     }
   </style>
 </head>
 <body>
 
-  <h2>تسجيل الدخول بالرقم</h2>
-  <input id="phoneNumber" type="text" placeholder="اكتب رقمك" />
-  <br>
+  <h2>تسجيل الدخول برقم الهاتف</h2>
+  <input id="phoneNumber" type="text" placeholder="أدخل رقمك بدون +20" />
   <button onclick="loginWithPhone()">دخول</button>
   <div id="message"></div>
 
@@ -61,47 +62,45 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
+    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     function showMessage(msg, isError = true) {
-      const div = document.getElementById("message");
+      const div = document.getElementById('message');
       div.textContent = msg;
-      div.style.color = isError ? "red" : "green";
+      div.style.color = isError ? 'red' : 'green';
     }
 
     function loginWithPhone() {
-      let phone = document.getElementById("phoneNumber").value.trim();
+      let phone = document.getElementById('phoneNumber').value.trim();
       if (!phone) {
-        showMessage("❗ أدخل رقم الهاتف");
+        showMessage('❗ من فضلك أدخل رقم الهاتف');
         return;
       }
 
-      if (!phone.startsWith("+")) {
-        phone = "+20" + phone;
+      if (!phone.startsWith('+')) {
+        phone = '+20' + phone;
       }
 
-      showMessage("⏳ جاري التحقق من الرقم...", false);
+      showMessage('⏳ جاري التحقق من الرقم...', false);
 
-      const refPath = "allowedPhones/" + phone;
+      const refPath = 'allowedPhones/' + phone;
       db.ref(refPath).get()
-  .then(snapshot => {
-    console.log("snapshot.exists() =", snapshot.exists());
-    console.log("snapshot.val() =", snapshot.val());
-
-    if (snapshot.exists() && snapshot.val() === true) {
-      showMessage("✅ رقمك متسجل، يتم الدخول...", false);
-      setTimeout(() => {
-        window.location.href = "home.html";
-      }, 1000);
-    } else {
-      showMessage("🚫 رقمك غير موجود في قاعدة البيانات.");
-    }
-  })
-  .catch(err => {
-    console.error("Firebase Error:", err);
-    showMessage("❌ خطأ في الاتصال بـ Firebase", true);
-  });
+        .then(snapshot => {
+          if (snapshot.exists() && snapshot.val() === true) {
+            showMessage('✅ رقمك مسجل! جاري الدخول...', false);
+            setTimeout(() => {
+              window.location.href = 'home.html';
+            }, 1200);
+          } else {
+            showMessage('🚫 رقمك غير موجود في قاعدة البيانات.');
+          }
+        })
+        .catch(error => {
+          showMessage('❌ حدث خطأ في الاتصال بقاعدة البيانات.');
+          console.error(error);
+        });
     }
   </script>
 
