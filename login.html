@@ -43,7 +43,7 @@
       try {
         const snapshot = await get(phoneRef);
         if (snapshot.exists() && snapshot.val() === true) {
-          alert("✅ مرحبًا! تم السماح بالدخول لرقمك: " + phone);
+          window.location.href = "home.html";
           // هنا يمكنك التوجيه إلى صفحة المستخدم:
           // window.location.href = "home.html";
         } else {
