@@ -2,13 +2,17 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>لوحة تحكم الأرقام المسموح بها</title>
-  <script type="module">
-    // استيراد Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getDatabase, ref, set, remove, get } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+  <title>إضافة رقم إلى Firebase</title>
+</head>
+<body>
+  <h2>إضافة رقم</h2>
+  <input type="text" id="phone" placeholder="أدخل رقم الهاتف بدون +20" />
+  <button onclick="addPhone()">إضافة</button>
 
-    // إعدادات Firebase الخاصة بك
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
       authDomain: "abu-shawqi-bouquets.firebaseapp.com",
@@ -19,143 +23,21 @@
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
 
-    // تهيئة التطبيق والقاعدة
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // إضافة رقم
-    window.addPhone = async () => {
+    window.addPhone = () => {
       let phone = document.getElementById('phone').value.trim();
+      if (!phone) return alert("أدخل رقم الهاتف");
 
-      if (!phone) {
-        alert("❗ الرجاء إدخال رقم الهاتف.");
-        return;
-      }
-
-      // إضافة +20 تلقائيًا إذا لم يكن موجود
       if (!phone.startsWith("+")) {
         phone = "+20" + phone;
       }
 
-      try {
-        await set(ref(db, 'allowedPhones/' + phone), true);
-        alert("✅ تم إضافة الرقم بنجاح: " + phone);
-        document.getElementById('phone').value = "";
-        loadPhones();
-      } catch (error) {
-        alert("❌ خطأ أثناء الإضافة: " + error.message);
-        console.error(error);
-      }
-    };
-
-    // حذف رقم
-    window.deletePhone = async (phone) => {
-      if (!confirm(`❓ هل تريد حذف الرقم ${phone}؟`)) return;
-
-      try {
-        await remove(ref(db, 'allowedPhones/' + phone));
-        alert("🗑️ تم الحذف بنجاح");
-        loadPhones();
-      } catch (error) {
-        alert("❌ خطأ أثناء الحذف: " + error.message);
-        console.error(error);
-      }
-    };
-
-    // تحميل الأرقام من القاعدة
-    window.loadPhones = async () => {
-      const list = document.getElementById('phonesList');
-      list.innerHTML = '🔄 جاري التحميل...';
-
-      try {
-        const snapshot = await get(ref(db, 'allowedPhones'));
-        list.innerHTML = '';
-
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          Object.keys(data).forEach(phone => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              ${phone}
-              <button onclick="deletePhone('${phone}')">🗑️ حذف</button>
-            `;
-            list.appendChild(li);
-          });
-        } else {
-          list.innerHTML = '<li>📭 لا توجد أرقام مسموح بها.</li>';
-        }
-      } catch (error) {
-        list.innerHTML = '❌ حدث خطأ أثناء التحميل.';
-        console.error(error);
-      }
-    };
-
-    // تحميل عند فتح الصفحة
-    window.onload = () => {
-      loadPhones();
+      set(ref(db, 'allowedPhones/' + phone), true)
+        .then(() => alert("✅ تمت الإضافة: " + phone))
+        .catch((error) => alert("❌ خطأ: " + error.message));
     };
   </script>
-
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: #f4f4f4;
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      text-align: center;
-    }
-    h2 {
-      color: #333;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px 0;
-      width: 90%;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      background-color: #28a745;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      background: white;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    li button {
-      background-color: #dc3545;
-      font-size: 14px;
-      padding: 5px 10px;
-    }
-    li button:hover {
-      background-color: #c82333;
-    }
-  </style>
-</head>
-<body>
-
-  <h2>لوحة تحكم الأرقام</h2>
-  <input type="text" id="phone" placeholder="اكتب الرقم بدون +20" />
-  <br>
-  <button onclick="addPhone()">📥 إضافة الرقم</button>
-
-  <h3>📋 الأرقام المسموح بها:</h3>
-  <ul id="phonesList">جاري التحميل...</ul>
-
 </body>
 </html>
