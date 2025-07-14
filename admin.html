@@ -39,6 +39,8 @@
       width: 90%;
       max-width: 400px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      text-align: right;
     }
     input, button {
       width: 100%;
@@ -55,13 +57,48 @@
       border: none;
       cursor: pointer;
       font-weight: bold;
+      transition: 0.3s ease;
     }
     button:hover {
       background: linear-gradient(45deg, #218838, #1e7e34);
     }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0 0;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      font-weight: bold;
+    }
+    li:last-child {
+      border-bottom: none;
+    }
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    .delete-btn:hover {
+      background: #c82333;
+    }
     .message {
       color: green;
       margin-top: 10px;
+      min-height: 20px;
     }
   </style>
 </head>
@@ -70,7 +107,18 @@
   <h1>لوحة تحكم النظام - الأدمن</h1>
 
   <div class="container">
-    <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم بدون +20" />
+    <h2>إضافة رقم مسموح</h2>
+    <input type="text" id="addPhoneInput" placeholder="أدخل رقم الهاتف بدون +20" />
+    <button onclick="addAllowedPhone()">➕ إضافة رقم مسموح</button>
+
+    <h3>الأرقام المسموحة</h3>
+    <ul id="allowedPhonesList">
+      <li>جاري التحميل...</li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم لتعديل بياناته بدون +20" />
     
     <div id="controls" style="display:none;">
       <input type="text" id="nameInput" placeholder="👤 اسم المستخدم" />
@@ -106,6 +154,58 @@
       box.style.color = color;
       box.textContent = text;
       setTimeout(() => box.textContent = '', 4000);
+    }
+
+    // إضافة رقم مسموح جديد
+    function addAllowedPhone() {
+      const phone = document.getElementById('addPhoneInput').value.trim();
+      if (!phone) return alert("❗ أدخل رقم الهاتف أولاً");
+
+      db.ref('allowedPhones/' + phone).set(true)
+        .then(() => {
+          alert("✅ تم إضافة الرقم المسموح بنجاح");
+          document.getElementById('addPhoneInput').value = "";
+          loadAllowedPhones();
+        })
+        .catch(err => alert("❌ خطأ: " + err.message));
+    }
+
+    // تحميل قائمة الأرقام المسموحة وعرضها
+    function loadAllowedPhones() {
+      const list = document.getElementById('allowedPhonesList');
+      list.innerHTML = '<li>جاري التحميل...</li>';
+
+      db.ref('allowedPhones').once('value')
+        .then(snapshot => {
+          const data = snapshot.val();
+          if (!data) {
+            list.innerHTML = '<li>لا توجد أرقام مسموحة.</li>';
+            return;
+          }
+          list.innerHTML = '';
+          Object.keys(data).forEach(phone => {
+            const li = document.createElement('li');
+            li.textContent = phone;
+            const delBtn = document.createElement('button');
+            delBtn.textContent = 'حذف';
+            delBtn.className = 'delete-btn';
+            delBtn.onclick = () => {
+              if (confirm(`هل تريد حذف الرقم ${phone}؟`)) {
+                db.ref('allowedPhones/' + phone).remove()
+                  .then(() => {
+                    alert('تم حذف الرقم');
+                    loadAllowedPhones();
+                  })
+                  .catch(err => alert('خطأ أثناء الحذف: ' + err.message));
+              }
+            };
+            li.appendChild(delBtn);
+            list.appendChild(li);
+          });
+        })
+        .catch(() => {
+          list.innerHTML = '<li>فشل في تحميل الأرقام.</li>';
+        });
     }
 
     function loadUser() {
@@ -156,10 +256,15 @@
         const newBalance = isAdd ? current + amount : current - amount;
         ref.set(newBalance).then(() => {
           showMessage("✅ تم تعديل الرصيد");
+        }).catch(err => {
+          showMessage("❌ خطأ في تعديل الرصيد: " + err.message, 'red');
         });
+      }).catch(err => {
+        showMessage("❌ خطأ في جلب الرصيد: " + err.message, 'red');
       });
     }
-  </script>
 
-</body>
-</html>
+    // تحميل قائمة الأرقام عند بدء الصفحة
+    window.onload = function() {
+      loadAllowedPhones();
+    };
