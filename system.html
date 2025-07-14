@@ -1,98 +1,128 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>معلومات نظامك</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>معلومات نظامك - أبو شوقي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
     body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(120deg, #a1c4fd, #c2e9fb);
-      margin: 0;
-      padding: 0;
+      background: linear-gradient(135deg, #8ec5fc, #e0c3fc);
+      margin: 0; padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      color: #333;
+      text-align: center;
     }
     .card {
-      background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      max-width: 400px;
+      background: rgba(255,255,255,0.95);
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       width: 90%;
-      text-align: right;
-      animation: fadeIn 1s ease-out;
+      max-width: 400px;
+      animation: fadeInUp 1s ease forwards;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
     }
-    .card h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: #333;
+    h1 {
+      margin-bottom: 25px;
+      color: #5a2a83;
+      font-weight: 900;
+      text-shadow: 0 0 8px #a18cd1;
     }
     .info {
-      margin: 10px 0;
-      font-size: 16px;
-      color: #555;
+      text-align: right;
+      font-size: 18px;
+      margin: 12px 0;
+      padding: 10px 15px;
+      background: #f3f3f3;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
     }
-    .info strong {
-      color: #000;
+    .label {
+      font-weight: 700;
+      color: #5a2a83;
+    }
+    .back-btn {
+      margin-top: 30px;
+      padding: 12px;
+      width: 100%;
+      background: linear-gradient(45deg, #5a2a83, #a18cd1);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .back-btn:hover {
+      background: linear-gradient(45deg, #a18cd1, #5a2a83);
     }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>معلومات نظامك</h2>
-  <div class="info">📱 رقمك: <strong id="phone">--</strong></div>
-  <div class="info">👤 الاسم: <strong id="name">--</strong></div>
-  <div class="info">📅 التجديد: <strong>يوم ٢٥</strong></div>
-  <div class="info">📦 نوع الباقة: <strong id="package">--</strong></div>
-  <div class="info">💰 ثمن الباقة الآن: <strong id="price">--</strong> جنيه</div>
-</div>
+  <div class="card">
+    <h1>معلومات نظامك</h1>
+    <div class="info"><span class="label">📱 رقم المستخدم: </span><span id="phone">جارٍ التحميل...</span></div>
+    <div class="info"><span class="label">👤 اسم صاحب الرقم: </span><span id="name">جارٍ التحميل...</span></div>
+    <div class="info"><span class="label">📅 التجديد: </span><span id="renew">جارٍ التحميل...</span></div>
+    <div class="info"><span class="label">📦 نوع الباقة: </span><span id="plan">جارٍ التحميل...</span></div>
+    <div class="info"><span class="label">💰 ثمن الباقة الآن: </span><span id="price">جارٍ التحميل...</span></div>
+    <div class="info"><span class="label">💸 الرصيد الحالي: </span><span id="balance">جارٍ التحميل...</span></div>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
-    authDomain: "abu-shawqi-bouquets.firebaseapp.com",
-    databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
-    projectId: "abu-shawqi-bouquets",
-    storageBucket: "abu-shawqi-bouquets.appspot.com",
-    messagingSenderId: "624365660732",
-    appId: "1:624365660732:web:da0b73e43cfde85a863139"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+    <button class="back-btn" onclick="window.location.href='home.html'">العودة إلى الصفحة الرئيسية</button>
+  </div>
 
-  const phone = sessionStorage.getItem("userPhone");
-  if (!phone) {
-    window.location.href = "index.html"; // حماية: من لم يسجل دخول يرجع
-  }
+  <script>
+    // Firebase إعداد
+    const firebaseConfig = {
+      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
+      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
+      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
+      projectId: "abu-shawqi-bouquets",
+      storageBucket: "abu-shawqi-bouquets.appspot.com",
+      messagingSenderId: "624365660732",
+      appId: "1:624365660732:web:da0b73e43cfde85a863139"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  document.getElementById("phone").textContent = phone;
+    // الحصول على رقم المستخدم من الجلسة
+    const phone = sessionStorage.getItem("userPhone");
+    if (!phone) {
+      alert("يرجى تسجيل الدخول أولاً.");
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("phone").textContent = phone;
 
-  const userRef = db.ref('usersData/' + phone);
-  userRef.once('value')
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        document.getElementById("name").textContent = data.name || "غير محدد";
-        document.getElementById("package").textContent = data.package || "غير محددة";
-        document.getElementById("price").textContent = data.price || "0";
-      } else {
-        document.getElementById("name").textContent = "غير معروف";
-        document.getElementById("package").textContent = "--";
-        document.getElementById("price").textContent = "--";
-      }
-    });
-</script>
+      // جلب بيانات النظام
+      db.ref('userSystemData/' + phone).once('value').then(snapshot => {
+        const data = snapshot.val() || {};
+        document.getElementById("name").textContent = data.name || "غير متوفر";
+        document.getElementById("renew").textContent = data.renew || "غير محدد";
+        document.getElementById("plan").textContent = data.plan || "غير محدد";
+        document.getElementById("price").textContent = data.price ? data.price + " جنيه" : "غير محدد";
+      });
+
+      // جلب الرصيد الحالي
+      db.ref('usersBalances/' + phone).once('value').then(snapshot => {
+        const balance = snapshot.exists() ? snapshot.val() : 0;
+        document.getElementById("balance").textContent = balance + " جنيه";
+      });
+    }
+  </script>
 
 </body>
 </html>
