@@ -89,7 +89,7 @@
       list-style: none;
       padding: 0;
       width: 90%;
-      max-width: 400px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
@@ -99,8 +99,10 @@
       margin: 10px 0;
       border-radius: 8px;
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
+      justify-content: space-between;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
 
@@ -115,6 +117,35 @@
 
     .delete-btn:hover {
       background: #c82333;
+    }
+
+    .balance-box {
+      font-size: 14px;
+      color: #555;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 5px;
+      text-align: center;
+    }
+
+    .action-btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .plus {
+      background: #28a745;
+      color: white;
+    }
+
+    .minus {
+      background: #ffc107;
+      color: black;
     }
 
     #message {
@@ -175,28 +206,56 @@
       if (!confirm("هل تريد حذف الرقم " + phone + "؟")) return;
       db.ref('allowedPhones/' + phone).remove()
         .then(() => {
+          db.ref('usersBalances/' + phone).remove(); // احذف الرصيد أيضاً
           showMessage("🗑️ تم الحذف");
           loadPhones();
         })
         .catch(err => alert("❌ خطأ أثناء الحذف: " + err.message));
     }
 
+    function updateBalance(phone, amount, isAdd) {
+      const balanceRef = db.ref('usersBalances/' + phone);
+      balanceRef.get().then(snapshot => {
+        let current = snapshot.exists() ? parseFloat(snapshot.val()) : 0;
+        if (!isAdd && amount > current) {
+          alert("❌ لا يمكن خصم مبلغ أكبر من الرصيد الحالي");
+          return;
+        }
+        const newBalance = isAdd ? current + amount : current - amount;
+        balanceRef.set(newBalance).then(() => {
+          showMessage("✅ تم تحديث الرصيد");
+          loadPhones();
+        });
+      });
+    }
+
     function loadPhones() {
       const list = document.getElementById('phoneList');
       list.innerHTML = '<li>⏳ جاري التحميل...</li>';
       db.ref('allowedPhones').once('value')
-        .then(snapshot => {
+        .then(async snapshot => {
           list.innerHTML = '';
           const data = snapshot.val();
           if (!data) {
             list.innerHTML = '<li>🚫 لا توجد أرقام مسجلة.</li>';
             return;
           }
-          Object.keys(data).forEach(phone => {
+
+          for (const phone of Object.keys(data)) {
+            const balanceSnapshot = await db.ref('usersBalances/' + phone).get();
+            const balance = balanceSnapshot.exists() ? balanceSnapshot.val() : 0;
+
             const li = document.createElement('li');
-            li.innerHTML = `${phone} <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>`;
+            li.innerHTML = `
+              <div style="flex: 1; font-weight:bold;">📱 ${phone}</div>
+              <div class="balance-box">💰 ${balance} جنيه</div>
+              <input type="number" id="amount-${phone}" placeholder="0" />
+              <button class="action-btn plus" onclick="updateBalance('${phone}', parseFloat(document.getElementById('amount-${phone}').value), true)">➕</button>
+              <button class="action-btn minus" onclick="updateBalance('${phone}', parseFloat(document.getElementById('amount-${phone}').value), false)">➖</button>
+              <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>
+            `;
             list.appendChild(li);
-          });
+          }
         })
         .catch(() => {
           list.innerHTML = '<li>❌ فشل في تحميل الأرقام.</li>';
