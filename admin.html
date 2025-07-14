@@ -2,171 +2,91 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>لوحة تحكم الأرقام</title>
+  <title>لوحة تحكم الأدمن</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-  <!-- Firebase SDK compat -->
+  
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-
     body {
       font-family: 'Cairo', sans-serif;
       margin: 0;
       padding: 0;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4);
       background-size: 800% 800%;
       animation: oceanWaves 20s ease infinite;
+      min-height: 100vh;
     }
-
     @keyframes oceanWaves {
       0% { background-position: 0% 100%; }
       50% { background-position: 100% 0%; }
       100% { background-position: 0% 100%; }
     }
-
     h1 {
-      font-size: 32px;
-      font-weight: 900;
+      margin: 20px;
       color: white;
-      margin: 30px 0 20px;
-      text-shadow: 0 0 10px #fff, 0 0 25px #f0f, 0 0 35px #0ff;
-      animation: pulseGlow 3s infinite ease-in-out, slideText 4s infinite alternate;
+      text-shadow: 0 0 10px #fff;
     }
-
-    @keyframes pulseGlow {
-      0% { text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #0ff; }
-      100% { text-shadow: 0 0 25px #fff, 0 0 40px #f0f, 0 0 55px #0ff; }
-    }
-
-    @keyframes slideText {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.05); }
-    }
-
     .container {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
+      background: white;
       padding: 30px;
+      border-radius: 20px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.15);
-      text-align: center;
-      margin-bottom: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    .container input, .container button {
+    input, button {
       width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      margin: 12px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    .container button {
-      background: linear-gradient(45deg, #28a745, #218838);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-      transition: 0.3s ease;
-    }
-
-    .container button:hover {
-      background: linear-gradient(45deg, #218838, #1e7e34);
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      width: 90%;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    li {
-      background: white;
       padding: 12px;
       margin: 10px 0;
-      border-radius: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-
-    .delete-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-
-    .delete-btn:hover {
-      background: #c82333;
-    }
-
-    .balance-box {
-      font-size: 14px;
-      color: #555;
-    }
-
-    input[type="number"] {
-      width: 80px;
-      padding: 5px;
-      text-align: center;
-    }
-
-    .action-btn {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .plus {
-      background: #28a745;
-      color: white;
-    }
-
-    .minus {
-      background: #ffc107;
-      color: black;
-    }
-
-    #message {
+      border-radius: 10px;
+      border: 1px solid #ccc;
       font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background: linear-gradient(45deg, #28a745, #218838);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: linear-gradient(45deg, #218838, #1e7e34);
+    }
+    .message {
       color: green;
-      margin-bottom: 15px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Abu Shawqi for bouquets</h1>
+  <h1>لوحة تحكم النظام - الأدمن</h1>
 
   <div class="container">
-    <h2>إدارة الأرقام المسموحة</h2>
-    <input type="text" id="phoneInput" placeholder="أدخل الرقم بدون +20" />
-    <button onclick="addPhone()">إضافة الرقم</button>
-    <div id="message"></div>
-  </div>
+    <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم بدون +20" />
+    
+    <div id="controls" style="display:none;">
+      <input type="text" id="nameInput" placeholder="👤 اسم المستخدم" />
+      <input type="text" id="planInput" placeholder="📦 نوع الباقة" />
+      <input type="number" id="priceInput" placeholder="💰 سعر الباقة" />
+      <input type="text" id="renewInput" placeholder="📅 تاريخ التجديد (مثلاً: ٢٥)" />
+      <input type="number" id="amountInput" placeholder="💸 المبلغ لتعديل الرصيد" />
+      
+      <button onclick="saveSystemInfo()">💾 حفظ بيانات النظام</button>
+      <button onclick="updateBalance(true)">➕ إضافة رصيد</button>
+      <button onclick="updateBalance(false)">➖ خصم رصيد</button>
+      <div class="message" id="messageBox"></div>
+    </div>
 
-  <ul id="phoneList"></ul>
+    <button onclick="loadUser()">🔍 تحميل بيانات المستخدم</button>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -178,91 +98,67 @@
       messagingSenderId: "624365660732",
       appId: "1:624365660732:web:da0b73e43cfde85a863139"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function showMessage(msg) {
-      document.getElementById('message').textContent = msg;
-      setTimeout(() => {
-        document.getElementById('message').textContent = '';
-      }, 3000);
+    function showMessage(text, color = 'green') {
+      const box = document.getElementById('messageBox');
+      box.style.color = color;
+      box.textContent = text;
+      setTimeout(() => box.textContent = '', 4000);
     }
 
-    function addPhone() {
-      const phone = document.getElementById('phoneInput').value.trim();
-      if (!phone) return alert("❗ أدخل رقم الهاتف أولاً");
+    function loadUser() {
+      const phone = document.getElementById("userPhone").value.trim();
+      if (!phone) return alert("❗ أدخل رقم المستخدم أولاً");
 
-      db.ref('allowedPhones/' + phone).set(true)
-        .then(() => {
-          showMessage("✅ تم الإضافة بنجاح");
-          document.getElementById('phoneInput').value = "";
-          loadPhones();
-        })
-        .catch(err => alert("❌ خطأ: " + err.message));
+      // جلب بيانات النظام
+      db.ref("userSystemData/" + phone).once("value").then(snapshot => {
+        const data = snapshot.val();
+        document.getElementById("nameInput").value = data?.name || "";
+        document.getElementById("planInput").value = data?.plan || "";
+        document.getElementById("priceInput").value = data?.price || "";
+        document.getElementById("renewInput").value = data?.renew || "";
+      });
+
+      // عرض الحقول
+      document.getElementById("controls").style.display = "block";
     }
 
-    function deletePhone(phone) {
-      if (!confirm("هل تريد حذف الرقم " + phone + "؟")) return;
-      db.ref('allowedPhones/' + phone).remove()
-        .then(() => {
-          db.ref('usersBalances/' + phone).remove(); // احذف الرصيد أيضاً
-          showMessage("🗑️ تم الحذف");
-          loadPhones();
-        })
-        .catch(err => alert("❌ خطأ أثناء الحذف: " + err.message));
+    function saveSystemInfo() {
+      const phone = document.getElementById("userPhone").value.trim();
+      if (!phone) return alert("❗ أدخل رقم المستخدم أولاً");
+
+      const info = {
+        name: document.getElementById("nameInput").value.trim(),
+        plan: document.getElementById("planInput").value.trim(),
+        price: document.getElementById("priceInput").value.trim(),
+        renew: document.getElementById("renewInput").value.trim()
+      };
+
+      db.ref("userSystemData/" + phone).set(info)
+        .then(() => showMessage("✅ تم حفظ بيانات النظام"))
+        .catch(err => showMessage("❌ خطأ: " + err.message, 'red'));
     }
 
-    function updateBalance(phone, amount, isAdd) {
-      const balanceRef = db.ref('usersBalances/' + phone);
-      balanceRef.get().then(snapshot => {
+    function updateBalance(isAdd) {
+      const phone = document.getElementById("userPhone").value.trim();
+      const amount = parseFloat(document.getElementById("amountInput").value);
+      if (!phone || isNaN(amount)) return alert("❗ أدخل الرقم والمبلغ بشكل صحيح");
+
+      const ref = db.ref("usersBalances/" + phone);
+      ref.once("value").then(snapshot => {
         let current = snapshot.exists() ? parseFloat(snapshot.val()) : 0;
         if (!isAdd && amount > current) {
           alert("❌ لا يمكن خصم مبلغ أكبر من الرصيد الحالي");
           return;
         }
         const newBalance = isAdd ? current + amount : current - amount;
-        balanceRef.set(newBalance).then(() => {
-          showMessage("✅ تم تحديث الرصيد");
-          loadPhones();
+        ref.set(newBalance).then(() => {
+          showMessage("✅ تم تعديل الرصيد");
         });
       });
     }
-
-    function loadPhones() {
-      const list = document.getElementById('phoneList');
-      list.innerHTML = '<li>⏳ جاري التحميل...</li>';
-      db.ref('allowedPhones').once('value')
-        .then(async snapshot => {
-          list.innerHTML = '';
-          const data = snapshot.val();
-          if (!data) {
-            list.innerHTML = '<li>🚫 لا توجد أرقام مسجلة.</li>';
-            return;
-          }
-
-          for (const phone of Object.keys(data)) {
-            const balanceSnapshot = await db.ref('usersBalances/' + phone).get();
-            const balance = balanceSnapshot.exists() ? balanceSnapshot.val() : 0;
-
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <div style="flex: 1; font-weight:bold;">📱 ${phone}</div>
-              <div class="balance-box">💰 ${balance} جنيه</div>
-              <input type="number" id="amount-${phone}" placeholder="0" />
-              <button class="action-btn plus" onclick="updateBalance('${phone}', parseFloat(document.getElementById('amount-${phone}').value), true)">➕</button>
-              <button class="action-btn minus" onclick="updateBalance('${phone}', parseFloat(document.getElementById('amount-${phone}').value), false)">➖</button>
-              <button class="delete-btn" onclick="deletePhone('${phone}')">حذف</button>
-            `;
-            list.appendChild(li);
-          }
-        })
-        .catch(() => {
-          list.innerHTML = '<li>❌ فشل في تحميل الأرقام.</li>';
-        });
-    }
-
-    window.onload = loadPhones;
   </script>
 
 </body>
