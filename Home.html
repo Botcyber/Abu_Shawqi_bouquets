@@ -65,6 +65,17 @@
       color: #444;
     }
 
+    .balance-box {
+      background: #f0f0f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .balance-box h3 {
+      margin-bottom: 10px;
+    }
+
     button {
       display: block;
       width: 100%;
@@ -81,17 +92,6 @@
 
     button:hover {
       background: linear-gradient(45deg, #218838, #1e7e34);
-    }
-
-    .box {
-      background: #f0f0f0;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-    }
-
-    .box h3 {
-      margin-bottom: 10px;
     }
 
     .services-list {
@@ -121,12 +121,12 @@
 </head>
 <body>
 
-  <!-- ✅ حماية الصفحة من الدخول بدون تسجيل -->
   <script>
-    if (!sessionStorage.getItem("userPhone")) {
-      window.location.href = "index.html";
-    }
-  </script>
+  // إذا لم يكن هناك رقم محفوظ في الجلسة، أعد توجيه المستخدم إلى صفحة الدخول
+  if (!sessionStorage.getItem("userPhone")) {
+    window.location.href = "index.html"; // غيّر اسم الصفحة إذا لزم
+  }
+</script>
 
   <header>أهلاً بك في موقع أبو شوقي</header>
 
@@ -135,9 +135,9 @@
 
     <button onclick="alert('سيتم إنشاء صفحة معلومات النظام لاحقًا')">معلومات نظامك</button>
 
-    <div class="box">
+    <div class="balance-box">
       <h3>💸 دفع لنظام رقمك الشهري</h3>
-      <p>المبلغ: <strong id="amountDisplay">0</strong> جنيه</p>
+      <p>المبلغ: <strong id="balanceAmount">0</strong> جنيه</p>
       <button onclick="window.location.href='pay.html'">الدفع الآن</button>
     </div>
 
@@ -162,18 +162,30 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // عرض رقم المستخدم
-    const phone = sessionStorage.getItem("userPhone");
-    document.getElementById("userPhone").textContent = "📱 رقمك: " + phone;
+    let phone = sessionStorage.getItem("userPhone");
+    const phoneDiv = document.getElementById("userPhone");
+    const balanceEl = document.getElementById("balanceAmount");
 
-    // تحديث تلقائي للرصد من قاعدة البيانات
-    const amountRef = db.ref("amounts/" + phone);
-    amountRef.on("value", (snapshot) => {
-      const amount = snapshot.val();
-      document.getElementById("amountDisplay").textContent = amount !== null ? amount : "0";
-    });
+    if (!phone) {
+      phoneDiv.textContent = "📱 رقمك غير معروف!";
+      balanceEl.textContent = "0";
+    } else {
+      phoneDiv.textContent = "📱 رقمك: " + phone;
 
-    // إظهار / إخفاء الخدمات
+      // إضافة مستمع على تغيرات الرصيد في الوقت الفعلي
+      const balanceRef = db.ref('usersBalances/' + phone);
+      balanceRef.on('value', snapshot => {
+        if (snapshot.exists()) {
+          balanceEl.textContent = snapshot.val();
+        } else {
+          balanceEl.textContent = "0";
+        }
+      }, error => {
+        console.error("Failed to read balance:", error);
+        balanceEl.textContent = "0";
+      });
+    }
+
     function toggleServices() {
       const list = document.getElementById('servicesList');
       list.style.display = (list.style.display === 'none' || list.style.display === '') ? 'block' : 'none';
