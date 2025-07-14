@@ -12,15 +12,13 @@
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
     body {
       font-family: 'Cairo', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      margin: 0; padding: 0;
       background: linear-gradient(270deg, #ff9a9e, #fad0c4);
       background-size: 800% 800%;
       animation: oceanWaves 20s ease infinite;
       min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 10px;
     }
     @keyframes oceanWaves {
       0% { background-position: 0% 100%; }
@@ -34,14 +32,14 @@
     }
     .container {
       background: white;
-      padding: 30px;
       border-radius: 20px;
+      padding: 20px;
       width: 90%;
-      max-width: 400px;
+      max-width: 700px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
-    input, button {
+    input, button, select {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
@@ -64,8 +62,8 @@
     ul {
       list-style: none;
       padding: 0;
-      max-width: 600px;
-      width: 90%;
+      max-width: 700px;
+      width: 100%;
       margin: 0 auto;
     }
     li {
@@ -73,12 +71,24 @@
       padding: 12px;
       margin: 10px 0;
       border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
       justify-content: space-between;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      direction: rtl;
+    }
+    .phone-data {
+      flex: 1 1 250px;
+      min-width: 250px;
+    }
+    .balance-box {
+      font-weight: bold;
+      color: #444;
+      min-width: 90px;
+      text-align: center;
     }
     .delete-btn {
       background: #dc3545;
@@ -88,30 +98,20 @@
       padding: 6px 10px;
       cursor: pointer;
       flex-shrink: 0;
+      min-width: 80px;
     }
     .delete-btn:hover {
       background: #c82333;
     }
-    .balance-box {
-      font-size: 14px;
-      color: #555;
-      flex-shrink: 0;
-      min-width: 80px;
-      text-align: center;
-    }
-    input[type="number"] {
-      width: 80px;
-      padding: 5px;
-      text-align: center;
-      flex-shrink: 0;
-    }
     .action-btn {
-      padding: 6px 10px;
-      border-radius: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
       border: none;
       font-weight: bold;
       cursor: pointer;
       flex-shrink: 0;
+      min-width: 100px;
+      margin-left: 5px;
     }
     .plus {
       background: #28a745;
@@ -124,192 +124,231 @@
     #message {
       font-size: 16px;
       color: green;
-      margin: 15px auto;
+      margin: 10px auto;
       text-align: center;
-      max-width: 600px;
+      max-width: 700px;
       min-height: 24px;
     }
   </style>
 </head>
 <body>
 
-  <h1>لوحة تحكم النظام - الأدمن</h1>
+<h1>لوحة تحكم النظام - الأدمن</h1>
 
-  <div class="container">
-    <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم بدون +20" />
-    <button id="loadUserBtn">🔍 تحميل بيانات المستخدم</button>
-    
-    <div id="controls" style="display:none;">
-      <input type="text" id="nameInput" placeholder="👤 اسم المستخدم" />
-      <input type="text" id="planInput" placeholder="📦 نوع الباقة" />
-      <input type="number" id="priceInput" placeholder="💰 سعر الباقة" />
-      <input type="text" id="renewInput" placeholder="📅 تاريخ التجديد (مثلاً: ٢٥)" />
-      <input type="number" id="amountInput" placeholder="💸 المبلغ لتعديل الرصيد" />
-      
-      <button id="saveBtn">💾 حفظ بيانات النظام</button>
-      <button id="addBalanceBtn">➕ إضافة رصيد</button>
-      <button id="subtractBalanceBtn">➖ خصم رصيد</button>
-    </div>
+<div class="container">
+  <h2>تعديل بيانات مستخدم</h2>
+  <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم بدون +20" />
+  <button id="loadUserBtn">🔍 تحميل بيانات المستخدم</button>
 
-    <div style="margin-top:20px;">
-      <input type="text" id="newAllowedPhone" placeholder="أدخل رقم جديد للسماح له بالدخول بدون +20" />
-      <button id="addAllowedPhoneBtn">➕ إضافة رقم مسموح</button>
-    </div>
+  <div id="controls" style="display:none;">
+    <input type="text" id="nameInput" placeholder="👤 اسم المستخدم" />
+    <input type="text" id="planInput" placeholder="📦 نوع الباقة" />
+    <input type="number" id="priceInput" placeholder="💰 سعر الباقة" />
+    <input type="text" id="renewInput" placeholder="📅 تاريخ التجديد (مثلاً: ٢٥)" />
+    <button id="saveBtn">💾 حفظ بيانات النظام</button>
   </div>
+</div>
 
-  <div id="message"></div>
+<div class="container">
+  <h2>إضافة أو حذف رصيد</h2>
+  <select id="balancePhoneSelect">
+    <option value="">اختر رقم المستخدم</option>
+  </select>
+  <input type="number" id="amountInput" placeholder="💸 المبلغ" />
+  <button id="addBalanceBtn" class="action-btn plus">➕ إضافة رصيد</button>
+  <button id="subtractBalanceBtn" class="action-btn minus">➖ خصم رصيد</button>
+</div>
 
-  <div class="container">
-    <h2>الأرقام المسموحة</h2>
-    <ul id="phoneList"></ul>
-  </div>
+<div class="container">
+  <h2>إضافة رقم مسموح جديد</h2>
+  <input type="text" id="newAllowedPhone" placeholder="أدخل رقم جديد بدون +20" />
+  <button id="addAllowedPhoneBtn">➕ إضافة رقم مسموح</button>
+</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
-      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
-      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
-      projectId: "abu-shawqi-bouquets",
-      storageBucket: "abu-shawqi-bouquets.appspot.com",
-      messagingSenderId: "624365660732",
-      appId: "1:624365660732:web:da0b73e43cfde85a863139"
+<div class="container">
+  <h2>الأرقام المسموحة مع بياناتها</h2>
+  <ul id="phoneList"></ul>
+</div>
+
+<div id="message"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
+    authDomain: "abu-shawqi-bouquets.firebaseapp.com",
+    databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
+    projectId: "abu-shawqi-bouquets",
+    storageBucket: "abu-shawqi-bouquets.appspot.com",
+    messagingSenderId: "624365660732",
+    appId: "1:624365660732:web:da0b73e43cfde85a863139"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const userPhoneInput = document.getElementById("userPhone");
+  const nameInput = document.getElementById("nameInput");
+  const planInput = document.getElementById("planInput");
+  const priceInput = document.getElementById("priceInput");
+  const renewInput = document.getElementById("renewInput");
+  const controlsDiv = document.getElementById("controls");
+  const messageDiv = document.getElementById("message");
+  const phoneListUl = document.getElementById("phoneList");
+  const newAllowedPhoneInput = document.getElementById("newAllowedPhone");
+  const addAllowedPhoneBtn = document.getElementById("addAllowedPhoneBtn");
+  const balancePhoneSelect = document.getElementById("balancePhoneSelect");
+  const amountInput = document.getElementById("amountInput");
+  const addBalanceBtn = document.getElementById("addBalanceBtn");
+  const subtractBalanceBtn = document.getElementById("subtractBalanceBtn");
+
+  // تحميل بيانات المستخدم عند الضغط على زر
+  document.getElementById("loadUserBtn").addEventListener("click", () => {
+    const phone = userPhoneInput.value.trim();
+    if (!phone) return alert("❗ أدخل رقم المستخدم أولاً");
+
+    db.ref("userSystemData/" + phone).once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      nameInput.value = data.name || "";
+      planInput.value = data.plan || "";
+      priceInput.value = data.price || "";
+      renewInput.value = data.renew || "";
+      controlsDiv.style.display = "block";
+    }).catch(() => {
+      showMessage("❌ فشل تحميل بيانات المستخدم", "red");
+    });
+  });
+
+  // حفظ بيانات النظام
+  document.getElementById("saveBtn").addEventListener("click", () => {
+    const phone = userPhoneInput.value.trim();
+    if (!phone) return alert("❗ أدخل رقم المستخدم أولاً");
+
+    const info = {
+      name: nameInput.value.trim(),
+      plan: planInput.value.trim(),
+      price: priceInput.value.trim(),
+      renew: renewInput.value.trim()
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
-    const userPhoneInput = document.getElementById("userPhone");
-    const nameInput = document.getElementById("nameInput");
-    const planInput = document.getElementById("planInput");
-    const priceInput = document.getElementById("priceInput");
-    const renewInput = document.getElementById("renewInput");
-    const amountInput = document.getElementById("amountInput");
-    const controlsDiv = document.getElementById("controls");
-    const messageDiv = document.getElementById("message");
-    const phoneListUl = document.getElementById("phoneList");
-    const newAllowedPhoneInput = document.getElementById("newAllowedPhone");
-    const addAllowedPhoneBtn = document.getElementById("addAllowedPhoneBtn");
+    db.ref("userSystemData/" + phone).set(info)
+      .then(() => showMessage("✅ تم حفظ بيانات النظام"))
+      .catch(err => showMessage("❌ خطأ: " + err.message, "red"));
+  });
 
-    // تحميل بيانات المستخدم حسب الرقم المكتوب
-    document.getElementById("loadUserBtn").addEventListener("click", () => {
-      const phone = userPhoneInput.value.trim();
-      if (!phone) return alert("❗ أدخل رقم المستخدم أولاً");
+  // إضافة رقم مسموح جديد
+  addAllowedPhoneBtn.addEventListener("click", () => {
+    const newPhone = newAllowedPhoneInput.value.trim();
+    if (!newPhone) return alert("❗ أدخل رقم الهاتف أولاً");
 
-      db.ref("userSystemData/" + phone).once("value").then(snapshot => {
-        const data = snapshot.val();
-        nameInput.value = data?.name || "";
-        planInput.value = data?.plan || "";
-        priceInput.value = data?.price || "";
-        renewInput.value = data?.renew || "";
-        controlsDiv.style.display = "block";
+    db.ref("allowedPhones/" + newPhone).set(true)
+      .then(() => {
+        showMessage("✅ تم إضافة الرقم المسموح");
+        newAllowedPhoneInput.value = "";
+        loadAllowedPhones();
+      })
+      .catch(err => showMessage("❌ خطأ: " + err.message, "red"));
+  });
+
+  // حذف رقم مسموح
+  function deleteAllowedPhone(phone) {
+    if (!confirm(`هل تريد حذف الرقم ${phone}؟`)) return;
+
+    db.ref("allowedPhones/" + phone).remove()
+      .then(() => {
+        showMessage("🗑️ تم حذف الرقم");
+        loadAllowedPhones();
+      })
+      .catch(err => showMessage("❌ خطأ أثناء الحذف: " + err.message, "red"));
+  }
+
+  // تحديث الرصيد
+  function updateBalance(isAdd) {
+    const phone = balancePhoneSelect.value;
+    const amount = parseFloat(amountInput.value);
+    if (!phone) return alert("❗ اختر رقم المستخدم");
+    if (isNaN(amount) || amount <= 0) return alert("❗ أدخل مبلغ صحيح أكبر من صفر");
+
+    const balanceRef = db.ref("usersBalances/" + phone);
+    balanceRef.once("value").then(snapshot => {
+      let current = snapshot.exists() ? parseFloat(snapshot.val()) : 0;
+      if (!isAdd && amount > current) {
+        alert("❌ لا يمكن خصم مبلغ أكبر من الرصيد الحالي");
+        return;
+      }
+      const newBalance = isAdd ? current + amount : current - amount;
+      balanceRef.set(newBalance).then(() => {
+        showMessage(`✅ تم ${isAdd ? "إضافة" : "خصم"} الرصيد بنجاح`);
+        amountInput.value = "";
+        loadAllowedPhones();
       });
+    }).catch(() => {
+      showMessage("❌ خطأ في تحديث الرصيد", "red");
     });
+  }
 
-    // حفظ بيانات النظام
-    document.getElementById("saveBtn").addEventListener("click", () => {
-      const phone = userPhoneInput.value.trim();
-      if (!phone) return alert("❗ أدخل رقم المستخدم أولاً");
+  addBalanceBtn.addEventListener("click", () => updateBalance(true));
+  subtractBalanceBtn.addEventListener("click", () => updateBalance(false));
 
-      const info = {
-        name: nameInput.value.trim(),
-        plan: planInput.value.trim(),
-        price: priceInput.value.trim(),
-        renew: renewInput.value.trim()
-      };
+  // تحميل الأرقام المسموحة مع بياناتها
+  function loadAllowedPhones() {
+    phoneListUl.innerHTML = "<li>⏳ جاري التحميل...</li>";
+    balancePhoneSelect.innerHTML = '<option value="">اختر رقم المستخدم</option>';
 
-      db.ref("userSystemData/" + phone).set(info)
-        .then(() => showMessage("✅ تم حفظ بيانات النظام"))
-        .catch(err => showMessage("❌ خطأ: " + err.message, "red"));
+    db.ref("allowedPhones").once("value").then(async snapshot => {
+      const allowed = snapshot.val();
+      if (!allowed) {
+        phoneListUl.innerHTML = "<li>🚫 لا توجد أرقام مسموحة.</li>";
+        balancePhoneSelect.innerHTML = '<option value="">لا توجد أرقام</option>';
+        return;
+      }
+
+      phoneListUl.innerHTML = "";
+      for (const phone of Object.keys(allowed)) {
+        // جلب بيانات المستخدم
+        const dataSnap = await db.ref("userSystemData/" + phone).get();
+        const data = dataSnap.exists() ? dataSnap.val() : {};
+
+        // جلب الرصيد
+        const balanceSnap = await db.ref("usersBalances/" + phone).get();
+        const balance = balanceSnap.exists() ? balanceSnap.val() : 0;
+
+        // إضافة لل select الخاص بالرصيد
+        const option = document.createElement("option");
+        option.value = phone;
+        option.textContent = phone;
+        balancePhoneSelect.appendChild(option);
+
+        // إنشاء العنصر في القائمة
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <div class="phone-data">
+            <strong>📱 ${phone}</strong><br/>
+            👤 الاسم: ${data.name || "-"}<br/>
+            📦 الباقة: ${data.plan || "-"}<br/>
+            💰 السعر: ${data.price || "-"}<br/>
+            📅 التجديد: ${data.renew || "-"}
+          </div>
+          <div class="balance-box">الرصيد: ${balance} ج</div>
+          <button class="delete-btn" onclick="deleteAllowedPhone('${phone}')">حذف</button>
+        `;
+        phoneListUl.appendChild(li);
+      }
+    }).catch(() => {
+      phoneListUl.innerHTML = "<li>❌ فشل تحميل البيانات.</li>";
     });
+  }
 
-    // تحديث الرصيد
-    function updateBalance(isAdd) {
-      const phone = userPhoneInput.value.trim();
-      const amount = parseFloat(amountInput.value);
-      if (!phone || isNaN(amount)) return alert("❗ أدخل الرقم والمبلغ بشكل صحيح");
+  // عرض الرسائل المؤقتة
+  function showMessage(text, color = "green") {
+    messageDiv.style.color = color;
+    messageDiv.textContent = text;
+    setTimeout(() => {
+      messageDiv.textContent = "";
+    }, 4000);
+  }
 
-      const ref = db.ref("usersBalances/" + phone);
-      ref.once("value").then(snapshot => {
-        let current = snapshot.exists() ? parseFloat(snapshot.val()) : 0;
-        if (!isAdd && amount > current) {
-          alert("❌ لا يمكن خصم مبلغ أكبر من الرصيد الحالي");
-          return;
-        }
-        const newBalance = isAdd ? current + amount : current - amount;
-        ref.set(newBalance).then(() => {
-          showMessage("✅ تم تعديل الرصيد");
-          amountInput.value = "";
-        });
-      });
-    }
-    document.getElementById("addBalanceBtn").addEventListener("click", () => updateBalance(true));
-    document.getElementById("subtractBalanceBtn").addEventListener("click", () => updateBalance(false));
-
-    // رسالة حالة
-    function showMessage(text, color = "green") {
-      messageDiv.style.color = color;
-      messageDiv.textContent = text;
-      setTimeout(() => {
-        messageDiv.textContent = "";
-      }, 4000);
-    }
-
-    // إضافة رقم مسموح جديد
-    addAllowedPhoneBtn.addEventListener("click", () => {
-      const newPhone = newAllowedPhoneInput.value.trim();
-      if (!newPhone) return alert("❗ أدخل رقم الهاتف أولاً");
-
-      db.ref("allowedPhones/" + newPhone).set(true)
-        .then(() => {
-          showMessage("✅ تم إضافة الرقم المسموح");
-          newAllowedPhoneInput.value = "";
-          loadAllowedPhones();
-        })
-        .catch(err => showMessage("❌ خطأ: " + err.message, "red"));
-    });
-
-    // حذف رقم مسموح
-    function deleteAllowedPhone(phone) {
-      if (!confirm(`هل تريد حذف الرقم ${phone}؟`)) return;
-
-      db.ref("allowedPhones/" + phone).remove()
-        .then(() => {
-          showMessage("🗑️ تم حذف الرقم");
-          loadAllowedPhones();
-        })
-        .catch(err => showMessage("❌ خطأ أثناء الحذف: " + err.message, "red"));
-    }
-
-    // تحميل وعرض الأرقام المسموحة
-    function loadAllowedPhones() {
-      phoneListUl.innerHTML = "<li>⏳ جاري التحميل...</li>";
-      db.ref("allowedPhones").once("value").then(snapshot => {
-        const data = snapshot.val();
-        phoneListUl.innerHTML = "";
-        if (!data) {
-          phoneListUl.innerHTML = "<li>🚫 لا توجد أرقام مسموحة حالياً.</li>";
-          return;
-        }
-        Object.keys(data).forEach(phone => {
-          const li = document.createElement("li");
-          li.textContent = phone;
-
-          // زر الحذف
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "حذف";
-          delBtn.classList.add("delete-btn");
-          delBtn.onclick = () => deleteAllowedPhone(phone);
-
-          li.appendChild(delBtn);
-          phoneListUl.appendChild(li);
-        });
-      }).catch(() => {
-        phoneListUl.innerHTML = "<li>❌ فشل تحميل الأرقام.</li>";
-      });
-    }
-
-    // تحميل الأرقام عند فتح الصفحة
-    window.onload = loadAllowedPhones;
-  </script>
+  // تحميل الأرقام عند بدء الصفحة
+  window.onload = loadAllowedPhones;
+</script>
 
 </body>
 </html>
