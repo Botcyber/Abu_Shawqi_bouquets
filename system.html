@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>معلومات نظامك</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to left, #fbc2eb, #a6c1ee);
+      background-size: 400% 400%;
+      animation: moveBg 10s infinite alternate;
+      color: #333;
+      text-align: center;
+    }
+
+    @keyframes moveBg {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    header {
+      padding: 20px;
+      font-size: 26px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ff69b4;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .info {
+      margin: 20px 0;
+      font-size: 18px;
+      line-height: 1.8;
+      text-align: right;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .back-button {
+      margin-top: 20px;
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .back-button:hover {
+      background: linear-gradient(45deg, #0056b3, #003f7f);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- منع الدخول بدون تسجيل -->
+  <script>
+    if (!sessionStorage.getItem("userPhone")) {
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <header>📄 معلومات نظامك</header>
+
+  <div class="container" id="infoBox">
+    <div class="info"><span class="label">📱 رقم الهاتف:</span> جاري التحميل...</div>
+    <div class="info"><span class="label">👤 اسم المستخدم:</span> جاري التحميل...</div>
+    <div class="info"><span class="label">📅 التجديد:</span> يوم ٢٥ من كل شهر</div>
+    <div class="info"><span class="label">📦 نوع الباقة:</span> جاري التحميل...</div>
+    <div class="info"><span class="label">💰 سعر الباقة:</span> جاري التحميل... جنيه</div>
+
+    <button class="back-button" onclick="history.back()">⬅️ رجوع</button>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBksUQfseucTTUTrM8o-54kQizUYrcXlQQ",
+      authDomain: "abu-shawqi-bouquets.firebaseapp.com",
+      databaseURL: "https://abu-shawqi-bouquets-default-rtdb.firebaseio.com",
+      projectId: "abu-shawqi-bouquets",
+      storageBucket: "abu-shawqi-bouquets.appspot.com",
+      messagingSenderId: "624365660732",
+      appId: "1:624365660732:web:da0b73e43cfde85a863139"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const phone = sessionStorage.getItem("userPhone");
+    const infoBox = document.getElementById("infoBox");
+    const infos = infoBox.getElementsByClassName("info");
+
+    infos[0].innerHTML = `<span class="label">📱 رقم الهاتف:</span> ${phone}`;
+
+    // جلب بيانات المستخدم من المسار users/رقم الهاتف
+    db.ref("users/" + phone).once("value").then(snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        infos[1].innerHTML = `<span class="label">👤 اسم المستخدم:</span> ${data.name || "غير محدد"}`;
+        infos[3].innerHTML = `<span class="label">📦 نوع الباقة:</span> ${data.package || "غير متوفر"}`;
+        infos[4].innerHTML = `<span class="label">💰 سعر الباقة:</span> ${data.price || 0} جنيه`;
+      } else {
+        infos[1].innerHTML = `<span class="label">👤 اسم المستخدم:</span> غير موجود`;
+        infos[3].innerHTML = `<span class="label">📦 نوع الباقة:</span> غير موجود`;
+        infos[4].innerHTML = `<span class="label">💰 سعر الباقة:</span> 0 جنيه`;
+      }
+    }).catch(error => {
+      console.error("خطأ في جلب البيانات:", error);
+    });
+  </script>
+
+</body>
+</html>
