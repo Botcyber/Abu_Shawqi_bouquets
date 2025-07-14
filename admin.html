@@ -137,7 +137,7 @@
 
 <div class="container">
   <h2>تعديل بيانات مستخدم</h2>
-  <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم بدون +20" />
+  <input type="text" id="userPhone" placeholder="📱 اكتب رقم المستخدم" />
   <button id="loadUserBtn">🔍 تحميل بيانات المستخدم</button>
 
   <div id="controls" style="display:none;">
@@ -161,7 +161,7 @@
 
 <div class="container">
   <h2>إضافة رقم مسموح جديد</h2>
-  <input type="text" id="newAllowedPhone" placeholder="أدخل رقم جديد بدون +20" />
+  <input type="text" id="newAllowedPhone" placeholder="أدخل رقم جديد" />
   <button id="addAllowedPhoneBtn">➕ إضافة رقم مسموح</button>
 </div>
 
@@ -325,7 +325,7 @@
             👤 الاسم: ${data.name || "-"}<br/>
             📦 الباقة: ${data.plan || "-"}<br/>
             💰 السعر: ${data.price || "-"}<br/>
-            📅 التجديد: ${data.renew || "-"}
+            📅 التجديد يوم: ${data.renew || "-"}
           </div>
           <div class="balance-box">الرصيد: ${balance} ج</div>
           <button class="delete-btn" onclick="deleteAllowedPhone('${phone}')">حذف</button>
